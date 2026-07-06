@@ -21,14 +21,22 @@ const RoomSchema = new Schema(
     },
 
     players: [
-      {
-        id: String,
-        name: String,
-        score: {
-          type: Number,
-          default: 0,
+    {
+            id: {
+            type: String,
+            required: true,
+            },
+
+            name: {
+            type: String,
+            required: true,
+            },
+
+            score: {
+            type: Number,
+            default: 0,
+            },
         },
-      },
     ],
 
     quizId: {
