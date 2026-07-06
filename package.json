@@ -8,5 +8,13 @@
   ],
   "scripts": {
     "dev": "echo \"Configure client and server first\""
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.101.2",
+    "axios": "^1.18.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^1.23.0",
+    "react-hot-toast": "^2.6.0",
+    "zustand": "^5.0.14"
   }
 }
