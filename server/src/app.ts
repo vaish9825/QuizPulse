@@ -26,3 +26,9 @@ app.get("/health", (_req, res) => {
 app.use("/api/rooms", roomRoutes);
 
 export default app;
+
+import { errorMiddleware } from "./common/middleware/error.middleware.js";
+
+// routes...
+
+app.use(errorMiddleware);

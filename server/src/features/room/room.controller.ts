@@ -1,40 +1,39 @@
 import { Request, Response } from "express";
-import { createRoom } from "./room.service.js";
-import { joinRoom } from "./room.service.js";
+import { StatusCodes } from "http-status-codes";
 
-export async function createRoomController(
-  req: Request,
-  res: Response
-) {
-  try {
+import { asyncHandler } from "../../common/utils/asyncHandler.js";
+import { successResponse } from "../../common/utils/apiResponse.js";
+import { createRoom, joinRoom } from "./room.service.js";
+
+import { JoinRoomSchema } from "./room.validation.js";
+
+export const createRoomController = asyncHandler(
+  async (_req: Request, res: Response) => {
     const room = await createRoom("host-demo");
 
-    res.status(201).json(room);
-  } catch (error) {
-    res.status(500).json({
-      message: "Failed to create room",
-    });
+    res
+      .status(StatusCodes.CREATED)
+      .json(
+        successResponse(
+          room,
+          "Room created successfully"
+        )
+      );
   }
-}
+);
 
-export async function joinRoomController(
-  req: Request,
-  res: Response
-) {
-  try {
+export const joinRoomController = asyncHandler(
+  async (req: Request, res: Response) => {
     const { code } = req.params;
+    const body = JoinRoomSchema.parse(req.body);
 
-    const { name } = req.body;
+    const room = await joinRoom(code as string, body.name);
 
-  const room = await joinRoom(code as string, name);
-
-    res.json(room);
-  } catch (error) {
-    res.status(404).json({
-      message:
-        error instanceof Error
-          ? error.message
-          : "Unknown Error",
-    });
+    res.status(StatusCodes.OK).json(
+      successResponse(
+        room,
+        "Player joined successfully"
+      )
+    );
   }
-}
+);

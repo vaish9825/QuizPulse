@@ -1,7 +1,21 @@
 {
-  "files": [],
-  "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
-  ]
+  "compilerOptions": {
+    "target": "ES2023",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+
+    "rootDir": "./src",
+    "outDir": "./dist",
+
+    "strict": true,
+
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+
+    "resolveJsonModule": true,
+
+    "types": ["node"]
+  },
+
+  "include": ["src"]
 }
