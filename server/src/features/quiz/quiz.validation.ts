@@ -1,9 +1,9 @@
 import { z } from "zod";
 
-const QuestionSchema = z.object({
+export const QuestionSchema = z.object({
   question: z.string().min(5).max(300),
 
-  type: z.enum(["mcq", "true_false"]),
+  type: z.enum(["mcq", "true_false"]).default("mcq"),
 
   options: z.array(z.string()).min(2),
 
@@ -17,15 +17,23 @@ const QuestionSchema = z.object({
 });
 
 export const CreateQuizSchema = z.object({
-  title: z.string().min(3).max(100),
+  title: z.string().min(3),
 
-  description: z.string().optional(),
+  description: z.string().default(""),
 
-  difficulty: z.enum([
-    "easy",
-    "medium",
-    "hard",
-  ]),
+  difficulty: z
+    .enum(["easy", "medium", "hard"])
+    .default("easy"),
 
-  questions: z.array(QuestionSchema).min(1),
+  questions: z.array(QuestionSchema),
+
+  createdBy: z
+    .string()
+    .default("anonymous"),
 });
+
+export const UpdateQuizSchema =
+  CreateQuizSchema.partial();
+
+export type CreateQuizInput = z.infer<typeof CreateQuizSchema>;
+export type UpdateQuizInput = z.infer<typeof UpdateQuizSchema>;
