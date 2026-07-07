@@ -3,6 +3,7 @@ import cors from "cors";
 
 import { env } from "./config/env.js";
 import roomRoutes from "./features/room/room.routes.js";
+import quizRoutes from "./features/quiz/quiz.routes.js";
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.get("/health", (_req, res) => {
 
 // 👇 THIS IS THE IMPORTANT LINE
 app.use("/api/rooms", roomRoutes);
+app.use("/api/quizzes", quizRoutes);
 
 export default app;
 
@@ -32,3 +34,11 @@ import { errorMiddleware } from "./common/middleware/error.middleware.js";
 // routes...
 
 app.use(errorMiddleware);
+
+app.get("/", (_req, res) => {
+  res.json({
+    success: true,
+    message: "QuizPulse API 🚀",
+    version: "1.0.0",
+  });
+});
