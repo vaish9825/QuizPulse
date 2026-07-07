@@ -1,39 +1,47 @@
 import { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 
-import { asyncHandler } from "../../common/utils/asyncHandler.js";
-import { successResponse } from "../../common/utils/apiResponse.js";
-import { createRoom, joinRoom } from "./room.service.js";
+import {
+  CreateRoomSchema,
+  JoinRoomSchema,
+} from "./room.validation.js";
 
-import { JoinRoomSchema } from "./room.validation.js";
+import {
+  createRoom,
+  joinRoom,
+} from "./room.service.js";
 
-export const createRoomController = asyncHandler(
-  async (_req: Request, res: Response) => {
-    const room = await createRoom("host-demo");
+export async function createRoomController(
+  req: Request,
+  res: Response
+) {
+  const body = CreateRoomSchema.parse(req.body);
 
-    res
-      .status(StatusCodes.CREATED)
-      .json(
-        successResponse(
-          room,
-          "Room created successfully"
-        )
-      );
-  }
-);
+  const room = await createRoom(
+    body.quizId,
+    body.hostId
+  );
 
-export const joinRoomController = asyncHandler(
-  async (req: Request, res: Response) => {
-    const { code } = req.params;
-    const body = JoinRoomSchema.parse(req.body);
+  res.status(StatusCodes.CREATED).json({
+    success: true,
+    message: "Room created successfully",
+    data: room,
+  });
+}
 
-    const room = await joinRoom(code as string, body.name);
+export async function joinRoomController(
+  req: Request<{ roomCode: string }>,
+  res: Response
+) {
+  const { roomCode } = req.params;
 
-    res.status(StatusCodes.OK).json(
-      successResponse(
-        room,
-        "Player joined successfully"
-      )
-    );
-  }
-);
+  const body = JoinRoomSchema.parse(req.body);
+
+  const room = await joinRoom(roomCode, body.nickname);
+
+  res.status(StatusCodes.OK).json({
+    success: true,
+    message: "Joined room successfully",
+    data: room,
+  });
+}

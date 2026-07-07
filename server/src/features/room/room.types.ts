@@ -5,3 +5,7 @@ export interface CreateRoomResponse {
 export interface JoinRoomBody {
   name: string;
 }
+
+export interface JoinRoomBody {
+  nickname: string;
+}

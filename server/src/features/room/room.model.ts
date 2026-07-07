@@ -1,17 +1,54 @@
 import mongoose, { Schema } from "mongoose";
 
+const PlayerSchema = new Schema(
+  {
+    playerId: {
+      type: String,
+      required: true,
+    },
+
+    nickname: {
+      type: String,
+      required: true,
+    },
+
+    score: {
+      type: Number,
+      default: 0,
+    },
+
+    joinedAt: {
+      type: Date,
+      default: Date.now,
+    },
+
+    isConnected: {
+      type: Boolean,
+      default: true,
+    },
+  },
+  {
+    _id: false,
+  }
+);
+
 const RoomSchema = new Schema(
   {
     roomCode: {
       type: String,
-      required: true,
       unique: true,
-      uppercase: true,
+      required: true,
+    },
+
+    quizId: {
+      type: Schema.Types.ObjectId,
+      ref: "Quiz",
+      required: true,
     },
 
     hostId: {
       type: String,
-      required: true,
+      default: "anonymous",
     },
 
     status: {
@@ -20,29 +57,14 @@ const RoomSchema = new Schema(
       default: "waiting",
     },
 
-    players: [
-    {
-            id: {
-            type: String,
-            required: true,
-            },
+    currentQuestionIndex: {
+      type: Number,
+      default: 0,
+    },
 
-            name: {
-            type: String,
-            required: true,
-            },
-
-            score: {
-            type: Number,
-            default: 0,
-            },
-        },
-    ],
-
-    quizId: {
-      type: Schema.Types.ObjectId,
-      ref: "Quiz",
-      default: null,
+    players: {
+      type: [PlayerSchema],
+      default: [],
     },
   },
   {

@@ -1,6 +1,5 @@
 import express from "express";
 import cors from "cors";
-
 import { env } from "./config/env.js";
 import roomRoutes from "./features/room/room.routes.js";
 import quizRoutes from "./features/quiz/quiz.routes.js";
