@@ -4,38 +4,42 @@
 
     /* Language */
     "target": "ES2023",
+    "useDefineForClassFields": true,
     "lib": ["ES2023", "DOM", "DOM.Iterable"],
 
     /* Modules */
     "module": "ESNext",
     "moduleResolution": "bundler",
     "moduleDetection": "force",
-    "allowImportingTsExtensions": true,
-    "allowArbitraryExtensions": true,
-    "verbatimModuleSyntax": true,
-    "noEmit": true,
 
     /* React */
     "jsx": "react-jsx",
 
-    /* Aliases */
-    "paths": {
-  "@/*": ["./src/*"]
-  },
+    /* Emit */
+    "noEmit": true,
+
+    /* Bundler */
+    "allowImportingTsExtensions": true,
+    "allowArbitraryExtensions": true,
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
 
     /* Types */
     "types": ["vite/client"],
 
-    /* Interop */
-    "isolatedModules": true,
-    "skipLibCheck": true,
-
-    /* Strictness */
+    /* Strict */
     "strict": true,
+    "skipLibCheck": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+
+    /* Path Aliases */
+    "ignoreDeprecations": "6.0",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
   },
 
   "include": ["src"]

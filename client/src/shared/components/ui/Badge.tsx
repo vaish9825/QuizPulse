@@ -4,12 +4,12 @@ interface BadgeProps {
   children: ReactNode;
 }
 
-const Badge = ({ children }: BadgeProps) => {
+export function Badge({
+  children,
+}: BadgeProps) {
   return (
-    <span className="rounded-full border border-indigo-500/30 bg-indigo-500/10 px-4 py-1 text-sm text-indigo-300">
+    <span className="rounded-full bg-indigo-600/20 px-3 py-1 text-xs font-medium text-indigo-300">
       {children}
     </span>
   );
-};
-
-export default Badge;
+}
