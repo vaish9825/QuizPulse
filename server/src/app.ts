@@ -3,6 +3,7 @@ import cors from "cors";
 import { env } from "./config/env.js";
 import roomRoutes from "./features/room/room.routes.js";
 import quizRoutes from "./features/quiz/quiz.routes.js";
+import gameRoutes from "./features/game/game.routes.js";
 
 const app = express();
 
@@ -14,6 +15,7 @@ app.use(
 );
 
 app.use(express.json());
+app.use("/api/game", gameRoutes);
 
 app.get("/health", (_req, res) => {
   res.json({

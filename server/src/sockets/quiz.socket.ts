@@ -1,30 +1,24 @@
 import { Server, Socket } from "socket.io";
 
-import { Room } from "../features/room/room.model.js";
+import { startGame } from "../features/game/game.service.js";
 
 export function registerQuizSocket(
   io: Server,
   socket: Socket
 ) {
-  socket.on(
-    "start-quiz",
-    async (roomCode: string) => {
-      const room = await Room.findOne({
-        roomCode,
-      });
+  socket.on("start-quiz", async (roomCode: string) => {
+  console.log("✅ RECEIVED start-quiz:", roomCode);
 
-      if (!room) return;
+  try {
+    const room = await startGame(roomCode);
 
-      room.status = "live";
-      room.currentQuestionIndex = 0;
-      room.currentQuestionStartedAt = new Date();
+    console.log("✅ GAME STARTED");
 
-      await room.save();
+    console.log("📢 Emitting quiz-started to room:", roomCode);
 
-      io.to(roomCode).emit(
-        "quiz-started",
-        room
-      );
-    }
-  );
+    io.to(roomCode).emit("quiz-started");
+  } catch (err) {
+    console.error(err);
+  }
+});
 }

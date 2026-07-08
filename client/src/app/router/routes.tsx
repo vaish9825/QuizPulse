@@ -3,7 +3,6 @@ import LoginPage from "@/features/auth/pages/LoginPage";
 import CreateQuizPage from "@/features/quiz/pages/CreateQuizPage";
 import HostRoomPage from "@/features/room/pages/HostRoomPage";
 import JoinRoomPage from "@/features/room/pages/JoinRoomPage";
-import PlayerPage from "@/features/player/pages/PlayerPage";
 import PlayQuizPage from "@/features/player/pages/PlayQuizPage";
 import QuestionPage from "@/features/player/pages/QuestionPage";
 
