@@ -61,7 +61,9 @@ export default function HostRoomPage() {
           {/* Room Code */}
 
           <div className="text-center">
-            <p className="text-slate-400">Room Code</p>
+            <p className="text-slate-400">
+              Room Code
+            </p>
 
             <h1 className="mt-4 text-6xl font-bold tracking-widest text-white">
               {room.roomCode}
@@ -81,30 +83,42 @@ export default function HostRoomPage() {
 
             <div className="mt-5 grid grid-cols-2 gap-4 text-sm text-slate-300 md:grid-cols-4">
               <div>
-                <p className="text-slate-500">Questions</p>
+                <p className="text-slate-500">
+                  Questions
+                </p>
+
                 <p className="font-semibold">
                   {room.quizId.questions.length}
                 </p>
               </div>
 
               <div>
-                <p className="text-slate-500">Players</p>
+                <p className="text-slate-500">
+                  Players
+                </p>
+
                 <p className="font-semibold">
                   {room.players.length}
                 </p>
               </div>
 
               <div>
-                <p className="text-slate-500">Status</p>
+                <p className="text-slate-500">
+                  Status
+                </p>
+
                 <p className="font-semibold capitalize">
-                  {room.game.status}
+                  {room.status}
                 </p>
               </div>
 
               <div>
-                <p className="text-slate-500">Question</p>
+                <p className="text-slate-500">
+                  Question
+                </p>
+
                 <p className="font-semibold">
-                  {room.game.currentQuestionIndex + 1} /{" "}
+                  {room.currentQuestionIndex + 1} /{" "}
                   {room.quizId.questions.length}
                 </p>
               </div>
@@ -158,10 +172,13 @@ export default function HostRoomPage() {
 
           <div className="mt-12 flex justify-center">
             <Button
-              onClick={() => startQuiz(room.roomCode)}
-            >
-              🚀 Start Quiz
-            </Button>
+            onClick={() => {
+              console.log("BUTTON CLICKED");
+              startQuiz(room.roomCode);
+            }}
+          >
+            🚀 Start Quiz
+          </Button>
           </div>
         </div>
       </div>

@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+
 import { socket } from "@/lib/socket";
 
 export function useHostSocket(
@@ -9,8 +10,6 @@ export function useHostSocket(
     socket.connect();
 
     socket.on("connect", () => {
-      console.log("🟢 Connected", socket.id);
-
       socket.emit("join-room", roomCode);
     });
 
@@ -28,5 +27,6 @@ export function useHostSocket(
 }
 
 export function startQuiz(roomCode: string) {
+
   socket.emit("start-quiz", roomCode);
 }

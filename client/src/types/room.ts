@@ -2,6 +2,8 @@ export interface Player {
   playerId: string;
   nickname: string;
   score: number;
+  joinedAt: string;
+  isConnected: boolean;
 }
 
 export interface Question {
@@ -14,13 +16,26 @@ export interface Quiz {
   _id: string;
   title: string;
   description: string;
+  difficulty: "easy" | "medium" | "hard";
   questions: Question[];
 }
 
 export interface Room {
+  _id: string;
+
   roomCode: string;
+
+  hostId: string;
+
   status: "waiting" | "live" | "finished";
+
   currentQuestionIndex: number;
+
+  currentQuestionStartedAt: string | null;
+
+  questionDuration: number;
+
   players: Player[];
+
   quizId: Quiz;
 }

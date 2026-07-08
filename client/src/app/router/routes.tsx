@@ -5,6 +5,7 @@ import HostRoomPage from "@/features/room/pages/HostRoomPage";
 import JoinRoomPage from "@/features/room/pages/JoinRoomPage";
 import PlayerPage from "@/features/player/pages/PlayerPage";
 import PlayQuizPage from "@/features/player/pages/PlayQuizPage";
+import QuestionPage from "@/features/player/pages/QuestionPage";
 
 export const routes = [
   {
@@ -28,11 +29,11 @@ export const routes = [
   element: <JoinRoomPage />,
   },
   {
-  path: "/play/:roomCode",
-  element: <PlayerPage />,
-  },
-  {
     path: "/play/:roomCode",
     element: <PlayQuizPage />,
+  },
+  {
+  path: "/play/:roomCode/question",
+  element: <QuestionPage />,
   },
 ];

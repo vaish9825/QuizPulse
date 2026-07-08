@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { roomApi } from "@/services/room.api";
-import type { Room } from "@/types/game"; // or "@/types/room"
+import type { Room } from "@/types/room";
 
 export function useRoom(roomCode: string) {
   return useQuery({

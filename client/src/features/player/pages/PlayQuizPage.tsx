@@ -1,14 +1,23 @@
 import { useParams } from "react-router-dom";
 
+import { usePlayerSocket } from "../hooks/usePlayerSocket";
+
 export default function PlayQuizPage() {
+  console.log("PlayQuizPage rendered");
   const { roomCode } = useParams();
 
-  return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center text-white">
-      Waiting for quiz to start...
+  usePlayerSocket(roomCode!);
 
-      <div className="mt-4">
-        Room: {roomCode}
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-slate-950 text-white">
+      <div className="text-center">
+        <h1 className="text-4xl font-bold text-red-500">
+          THIS IS PLAYQUIZPAGE
+        </h1>
+
+        <p className="mt-4 text-slate-400">
+          The quiz will begin automatically.
+        </p>
       </div>
     </div>
   );
