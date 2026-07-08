@@ -51,12 +51,15 @@ export async function joinRoomController(
 
     const body = JoinRoomSchema.parse(req.body);
 
-    const room = await joinRoom(roomCode, body.nickname);
+    const result = await joinRoom(
+      roomCode,
+      body.nickname
+    );
 
     res.status(StatusCodes.OK).json({
       success: true,
       message: "Joined room successfully",
-      data: room,
+      data: result,
     });
   } catch (error) {
     console.error("JOIN ROOM ERROR:", error);

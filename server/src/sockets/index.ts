@@ -1,5 +1,5 @@
 import { Server } from "socket.io";
-
+import { registerGameSocket } from "../features/game/game.socket.js";
 import { registerRoomSocket } from "./room.socket.js";
 import { registerQuizSocket } from "./quiz.socket.js";
 
@@ -14,6 +14,7 @@ export function registerSocketEvents(
 
     registerRoomSocket(io, socket);
     registerQuizSocket(io, socket);
+    registerGameSocket(io, socket);
 
     socket.on("disconnect", () => {
       console.log(

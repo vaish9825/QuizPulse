@@ -67,6 +67,12 @@ const RoomSchema = new Schema(
       default: null,
     },
 
+    answers: {
+      type: Map,
+      of: Number,
+      default: {},
+    },
+
     questionDuration: {
       type: Number,
       default: 20,

@@ -2,7 +2,6 @@ import { randomUUID } from "crypto";
 
 import { Room } from "./room.model.js";
 import { generateRoomCode } from "../../common/utils/generateRoomCode.js";
-import { getIO } from "../../sockets/socket.js";
 
 export async function createRoom(
   quizId: string,
@@ -41,24 +40,27 @@ export async function joinRoom(
     throw new Error("Nickname already taken");
   }
 
-  room.players.push({
+  const player = {
     playerId: randomUUID(),
     nickname,
     score: 0,
     joinedAt: new Date(),
     isConnected: true,
-  });
+  };
+
+  room.players.push(player);
 
   await room.save();
 
-  const io = getIO();
-
-  io.to(roomCode).emit("participants-updated");
-
-  return room;
+  return {
+    room,
+    player,
+  };
 }
 
-export async function getRoom(roomCode: string) {
+export async function getRoom(
+  roomCode: string
+) {
   const room = await Room.findOne({
     roomCode,
   }).populate("quizId");

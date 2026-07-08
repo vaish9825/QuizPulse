@@ -1,11 +1,5 @@
-export interface GameState {
-  status: "waiting" | "live" | "finished";
-
-  currentQuestionIndex: number;
-
-  startedAt: Date | null;
-
-  questionStartedAt: Date | null;
-
-  questionDuration: number;
+export interface SubmitAnswerPayload {
+  roomCode: string;
+  playerId: string;
+  answer: number;
 }

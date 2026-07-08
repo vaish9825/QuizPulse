@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+
 import { socket } from "@/lib/socket";
 
 import { Button } from "@/shared/components/ui/Button";
@@ -13,37 +14,51 @@ export default function JoinRoomForm() {
 
   const joinRoom = useJoinRoom();
 
-  const [roomCode, setRoomCode] = useState("");
-  const [nickname, setNickname] = useState("");
+  const [roomCode, setRoomCode] =
+    useState("");
 
-async function handleJoin() {
-  if (!roomCode || !nickname) {
-    toast.error("Please fill all fields.");
-    return;
+  const [nickname, setNickname] =
+    useState("");
+
+  async function handleJoin() {
+    if (!roomCode || !nickname) {
+      toast.error(
+        "Please fill all fields."
+      );
+      return;
+    }
+
+    try {
+      const response =
+        await joinRoom.mutateAsync({
+          roomCode,
+          nickname,
+        });
+
+      localStorage.setItem(
+        "playerId",
+        response.data.player.playerId
+      );
+
+      socket.connect();
+
+      socket.emit(
+        "join-room",
+        roomCode
+      );
+
+      toast.success(
+        "Joined room successfully!"
+      );
+
+      navigate(`/play/${roomCode}`);
+    } catch (error: any) {
+      toast.error(
+        error.response?.data?.message ??
+          "Unable to join room."
+      );
+    }
   }
-
-  try {
-    await joinRoom.mutateAsync({
-      roomCode,
-      nickname,
-    });
-
-    socket.connect();
-
-    socket.emit("join-room", roomCode);
-
-    toast.success("Joined room successfully!");
-
-    navigate(`/play/${roomCode}`);
-  } catch (error: any) {
-    console.error(error);
-
-    toast.error(
-      error.response?.data?.message ??
-      "Unable to join room."
-    );
-  }
-}
 
   return (
     <div className="space-y-6 rounded-xl bg-slate-900 p-8">
@@ -51,7 +66,9 @@ async function handleJoin() {
         placeholder="Room Code"
         value={roomCode}
         onChange={(e) =>
-          setRoomCode(e.target.value.toUpperCase())
+          setRoomCode(
+            e.target.value.toUpperCase()
+          )
         }
       />
 
