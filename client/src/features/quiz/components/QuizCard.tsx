@@ -1,8 +1,11 @@
+import { useNavigate } from "react-router-dom";
+
 import { Badge } from "@/shared/components/ui/Badge";
 import { Button } from "@/shared/components/ui/Button";
 import { Card } from "@/shared/components/ui/Card";
 
 import { useDeleteQuiz } from "../hooks/useDeleteQuiz";
+import { useCreateRoom } from "@/features/room/hooks/useCreateRoom";
 
 interface Props {
   id: string;
@@ -19,7 +22,10 @@ export default function QuizCard({
   difficulty,
   questionCount,
 }: Props) {
+  const navigate = useNavigate();
+
   const deleteQuiz = useDeleteQuiz();
+  const createRoom = useCreateRoom();
 
   async function handleDelete() {
     const confirmed = window.confirm(
@@ -29,6 +35,18 @@ export default function QuizCard({
     if (!confirmed) return;
 
     await deleteQuiz.mutateAsync(id);
+  }
+
+  async function handleStartLive() {
+    try {
+      const response = await createRoom.mutateAsync(id);
+
+      const roomCode = response.data.data.roomCode;
+
+      navigate(`/host/${roomCode}`);
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   return (
@@ -49,13 +67,19 @@ export default function QuizCard({
         </div>
 
         <div className="flex gap-3">
-          <Button>
-            Start Live
+          <Button
+            onClick={handleStartLive}
+            disabled={createRoom.isPending}
+          >
+            {createRoom.isPending
+              ? "Creating..."
+              : "Start Live"}
           </Button>
 
           <Button
             variant="danger"
             onClick={handleDelete}
+            disabled={deleteQuiz.isPending}
           >
             Delete
           </Button>

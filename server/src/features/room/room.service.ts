@@ -2,6 +2,7 @@ import { randomUUID } from "crypto";
 
 import { Room } from "./room.model.js";
 import { generateRoomCode } from "../../common/utils/generateRoomCode.js";
+import { getIO } from "../../sockets/socket.js";
 
 export async function createRoom(
   quizId: string,
@@ -49,6 +50,22 @@ export async function joinRoom(
   });
 
   await room.save();
+
+  const io = getIO();
+
+  io.to(roomCode).emit("participants-updated");
+
+  return room;
+}
+
+export async function getRoom(roomCode: string) {
+  const room = await Room.findOne({
+    roomCode,
+  }).populate("quizId");
+
+  if (!room) {
+    throw new Error("Room not found");
+  }
 
   return room;
 }

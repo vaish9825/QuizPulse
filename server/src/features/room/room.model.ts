@@ -62,6 +62,16 @@ const RoomSchema = new Schema(
       default: 0,
     },
 
+    currentQuestionStartedAt: {
+      type: Date,
+      default: null,
+    },
+
+    questionDuration: {
+      type: Number,
+      default: 20,
+    },
+
     players: {
       type: [PlayerSchema],
       default: [],

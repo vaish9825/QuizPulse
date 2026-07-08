@@ -1,10 +1,9 @@
-import { api } from "./api";
+import { api } from "./api.js";
 
 export const roomApi = {
   create(quizId: string) {
     return api.post("/rooms", {
       quizId,
-      hostId: "demo-host",
     });
   },
 
@@ -12,9 +11,5 @@ export const roomApi = {
     return api.post(`/rooms/${roomCode}/join`, {
       nickname,
     });
-  },
-
-  get(roomCode: string) {
-    return api.get(`/rooms/${roomCode}`);
   },
 };
