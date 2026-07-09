@@ -1,4 +1,5 @@
 import { Room } from "../room/room.model.js";
+import { GAME_STATUS } from "./game.constants.js";
 import type { SubmitAnswerPayload } from "./game.types.js";
 
 export async function startGame(roomCode: string) {
@@ -10,9 +11,10 @@ export async function startGame(roomCode: string) {
     throw new Error("Room not found");
   }
 
-  room.status = "live";
+  room.status = GAME_STATUS.LIVE;
   room.currentQuestionIndex = 0;
   room.currentQuestionStartedAt = new Date();
+  room.answers.clear();
 
   await room.save();
 
@@ -35,31 +37,39 @@ export async function getCurrentQuestion(
   const question =
     quiz.questions[room.currentQuestionIndex];
 
+  if (!question) {
+    throw new Error("Question not found");
+  }
+
   const duration =
-  question.timeLimit ??
-  room.questionDuration;
+    question.timeLimit ??
+    room.questionDuration;
 
-const elapsed = Math.floor(
-  (Date.now() -
-    new Date(
-      room.currentQuestionStartedAt!
-    ).getTime()) /
-    1000
-);
+  const elapsed = Math.floor(
+    (Date.now() -
+      new Date(
+        room.currentQuestionStartedAt!
+      ).getTime()) /
+      1000
+  );
 
-return {
-  index: room.currentQuestionIndex,
-  totalQuestions: quiz.questions.length,
-  question: question.question,
-  options: question.options,
+  return {
+    index: room.currentQuestionIndex,
 
-  duration,
+    totalQuestions:
+      quiz.questions.length,
 
-  remainingTime: Math.max(
-    duration - elapsed,
-    0
-  ),
-};
+    question: question.question,
+
+    options: question.options,
+
+    duration,
+
+    remainingTime: Math.max(
+      duration - elapsed,
+      0
+    ),
+  };
 }
 
 export async function submitAnswer(
@@ -73,44 +83,63 @@ export async function submitAnswer(
     throw new Error("Room not found");
   }
 
+  if (room.status !== GAME_STATUS.LIVE) {
+    throw new Error("Question is closed");
+  }
+
   const quiz = room.quizId as any;
 
   const question =
     quiz.questions[room.currentQuestionIndex];
 
+  if (!question) {
+    throw new Error("Question not found");
+  }
+
   const player = room.players.find(
-    (p) => p.playerId === payload.playerId
+    (p) =>
+      p.playerId === payload.playerId
   );
 
   if (!player) {
     throw new Error("Player not found");
   }
 
-  if (room.answers.has(payload.playerId)) {
-  throw new Error("Already answered");
-}
+  if (
+    room.answers.has(payload.playerId)
+  ) {
+    throw new Error(
+      "Already answered"
+    );
+  }
 
-room.answers.set(
-  payload.playerId,
-  payload.answer
-);
+  room.answers.set(
+    payload.playerId,
+    payload.answer
+  );
 
   const isCorrect =
     payload.answer ===
     question.correctAnswer;
 
   if (isCorrect) {
-    player.score += question.points ?? 100;
+    player.score +=
+      question.points ?? 100;
   }
 
   await room.save();
 
   return {
     correct: isCorrect,
+
     score: player.score,
+
     leaderboard: room.players
       .slice()
-      .sort((a, b) => b.score - a.score),
+      .sort(
+        (a, b) =>
+          b.score - a.score
+      ),
   };
 }
 
@@ -132,7 +161,23 @@ export async function nextQuestion(
 
   room.answers.clear();
 
+  room.status = GAME_STATUS.LIVE;
+
   await room.save();
+
+  return room;
+}
+
+export async function getRoom(
+  roomCode: string
+) {
+  const room = await Room.findOne({
+    roomCode,
+  }).populate("quizId");
+
+  if (!room) {
+    throw new Error("Room not found");
+  }
 
   return room;
 }

@@ -9,12 +9,31 @@ import type {
 
 export function useLeaderboard() {
   const [data, setData] =
-    useState<LeaderboardData | null>(null);
+    useState<LeaderboardData | null>(() => {
+      const cached =
+        sessionStorage.getItem(
+          "leaderboard"
+        );
+
+      return cached
+        ? JSON.parse(cached)
+        : null;
+    });
 
   useEffect(() => {
     const onLeaderboardUpdated = (
       payload: LeaderboardData
     ) => {
+      console.log(
+        "🏆 LEADERBOARD RECEIVED",
+        payload
+      );
+
+      sessionStorage.setItem(
+        "leaderboard",
+        JSON.stringify(payload)
+      );
+
       setData(payload);
     };
 

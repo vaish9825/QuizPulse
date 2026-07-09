@@ -61,33 +61,42 @@ export default function JoinRoomForm() {
   }
 
   return (
-    <div className="space-y-6 rounded-xl bg-slate-900 p-8">
-      <Input
-        placeholder="Room Code"
-        value={roomCode}
-        onChange={(e) =>
-          setRoomCode(
-            e.target.value.toUpperCase()
-          )
-        }
-      />
+    <div className="rounded-2xl border border-slate-200 bg-slate-50 p-8">
 
-      <Input
-        placeholder="Nickname"
-        value={nickname}
-        onChange={(e) =>
-          setNickname(e.target.value)
-        }
-      />
+      <div className="space-y-5">
 
-      <Button
-        onClick={handleJoin}
-        disabled={joinRoom.isPending}
-      >
-        {joinRoom.isPending
-          ? "Joining..."
-          : "Join Room"}
-      </Button>
+        <Input
+          placeholder="Room Code"
+          value={roomCode}
+          onChange={(e) =>
+            setRoomCode(
+              e.target.value.toUpperCase()
+            )
+          }
+        />
+
+        <Input
+          placeholder="Nickname"
+          value={nickname}
+          onChange={(e) =>
+            setNickname(
+              e.target.value
+            )
+          }
+        />
+
+        <Button
+          className="mt-3 w-full rounded-xl py-3"
+          onClick={handleJoin}
+          disabled={joinRoom.isPending}
+        >
+          {joinRoom.isPending
+            ? "Joining..."
+            : "Join Quiz"}
+        </Button>
+
+      </div>
+
     </div>
   );
 }

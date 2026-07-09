@@ -6,18 +6,63 @@ import { SOCKET_EVENTS } from "@/shared/constants/socket-events";
 
 export function useGameEvents(
   roomCode: string,
-  refreshQuestion: () => void
+  refreshQuestion?: () => void
 ) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const onNextQuestion = () => {
-      refreshQuestion();
+    console.log(
+      "🎮 useGameEvents mounted:",
+      roomCode
+    );
+
+    const onQuestionEnded = () => {
+      console.log(
+        "🟢 QUESTION_ENDED RECEIVED"
+      );
+
+      navigate(
+        `/play/${roomCode}/leaderboard`
+      );
     };
 
-    const onQuizFinished = () => {
-      navigate(`/play/${roomCode}/results`);
+    const onNextQuestion = () => {
+      console.log(
+        "🔵 NEXT_QUESTION RECEIVED"
+      );
+
+      if (refreshQuestion) {
+        refreshQuestion();
+      }
+
+      navigate(
+        `/play/${roomCode}/question`
+      );
     };
+
+    const onQuizFinished = (
+      payload: any
+    ) => {
+      console.log(
+        "🏁 QUIZ_FINISHED RECEIVED"
+      );
+
+      sessionStorage.setItem(
+        "finalLeaderboard",
+        JSON.stringify(
+          payload.leaderboard
+        )
+      );
+
+      navigate(
+        `/play/${roomCode}/results`
+      );
+    };
+
+    socket.on(
+      SOCKET_EVENTS.QUESTION_ENDED,
+      onQuestionEnded
+    );
 
     socket.on(
       SOCKET_EVENTS.NEXT_QUESTION,
@@ -30,6 +75,16 @@ export function useGameEvents(
     );
 
     return () => {
+      console.log(
+        "❌ useGameEvents unmounted:",
+        roomCode
+      );
+
+      socket.off(
+        SOCKET_EVENTS.QUESTION_ENDED,
+        onQuestionEnded
+      );
+
       socket.off(
         SOCKET_EVENTS.NEXT_QUESTION,
         onNextQuestion
@@ -41,8 +96,8 @@ export function useGameEvents(
       );
     };
   }, [
+    roomCode,
     navigate,
     refreshQuestion,
-    roomCode,
   ]);
 }

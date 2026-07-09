@@ -39,9 +39,11 @@ export default function QuizCard({
 
   async function handleStartLive() {
     try {
-      const response = await createRoom.mutateAsync(id);
+      const response =
+        await createRoom.mutateAsync(id);
 
-      const roomCode = response.data.data.roomCode;
+      const roomCode =
+        response.data.data.roomCode;
 
       navigate(`/host/${roomCode}`);
     } catch (error) {
@@ -50,23 +52,32 @@ export default function QuizCard({
   }
 
   return (
-    <Card>
-      <div className="space-y-4">
-        <h2 className="text-2xl font-bold text-white">
-          {title}
-        </h2>
+    <Card className="transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+      <div className="flex h-full flex-col justify-between">
 
-        <p className="text-slate-400">
-          {description}
-        </p>
+        {/* Header */}
 
-        <div className="flex gap-3">
-          <Badge>{difficulty}</Badge>
+        <div>
+          <h2 className="text-2xl font-bold text-slate-900">
+            {title}
+          </h2>
 
-          <Badge>{questionCount} Questions</Badge>
+          <p className="mt-3 line-clamp-2 text-slate-600 leading-relaxed">
+            {description}
+          </p>
+
+          <div className="mt-5 flex flex-wrap gap-2">
+            <Badge>{difficulty}</Badge>
+
+            <Badge>
+              {questionCount} Questions
+            </Badge>
+          </div>
         </div>
 
-        <div className="flex gap-3">
+        {/* Footer */}
+
+        <div className="mt-8 flex flex-wrap gap-3">
           <Button
             onClick={handleStartLive}
             disabled={createRoom.isPending}
@@ -84,6 +95,7 @@ export default function QuizCard({
             Delete
           </Button>
         </div>
+
       </div>
     </Card>
   );

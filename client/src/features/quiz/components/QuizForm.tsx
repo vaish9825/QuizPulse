@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 import { Button } from "@/shared/components/ui/Button";
 import { Input } from "@/shared/components/ui/Input";
+import { Card } from "@/shared/components/ui/Card";
 
 import { useCreateQuiz } from "../hooks/useCreateQuiz";
 import {
@@ -41,12 +42,15 @@ export default function QuizForm() {
     },
   });
 
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: "questions",
-  });
+  const { fields, append, remove } =
+    useFieldArray({
+      control,
+      name: "questions",
+    });
 
-  async function onSubmit(data: CreateQuizSchema) {
+  async function onSubmit(
+    data: CreateQuizSchema
+  ) {
     try {
       await createQuiz.mutateAsync(data);
 
@@ -55,111 +59,206 @@ export default function QuizForm() {
       navigate("/");
     } catch (error) {
       console.error(error);
-
     }
   }
 
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="space-y-8 rounded-xl bg-slate-900 p-8"
+      className="space-y-10"
     >
       {/* Quiz Details */}
 
-      <Input
-        placeholder="Quiz Title"
-        {...register("title")}
-      />
+      <Card>
 
-      <Input
-        placeholder="Description"
-        {...register("description")}
-      />
+        <div className="mb-8">
 
-      <Input
-        placeholder="Created By"
-        {...register("createdBy")}
-      />
+          <h2 className="text-3xl font-bold text-slate-900">
+            Quiz Details
+          </h2>
 
-      <select
-        {...register("difficulty")}
-        className="w-full rounded-xl border border-slate-700 bg-slate-900 p-3 text-white"
-      >
-        <option value="easy">Easy</option>
-        <option value="medium">Medium</option>
-        <option value="hard">Hard</option>
-      </select>
+          <p className="mt-2 text-slate-600">
+            Fill in the basic information
+            about your quiz.
+          </p>
 
-      <hr className="border-slate-700" />
+        </div>
+
+        <div className="space-y-6">
+
+          <Input
+            placeholder="Quiz Title"
+            {...register("title")}
+          />
+
+          <Input
+            placeholder="Description"
+            {...register(
+              "description"
+            )}
+          />
+
+          <Input
+            placeholder="Created By"
+            {...register(
+              "createdBy"
+            )}
+          />
+
+          <select
+            {...register(
+              "difficulty"
+            )}
+            className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-700 focus:border-blue-500 focus:outline-none"
+          >
+            <option value="easy">
+              Easy
+            </option>
+
+            <option value="medium">
+              Medium
+            </option>
+
+            <option value="hard">
+              Hard
+            </option>
+
+          </select>
+
+        </div>
+
+      </Card>
 
       {/* Questions */}
 
-      {fields.map((field, index) => (
-        <div
-          key={field.id}
-          className="space-y-4 rounded-xl border border-slate-700 p-6"
-        >
-          <h2 className="text-xl font-semibold text-white">
-            Question {index + 1}
-          </h2>
-
-          <Input
-            placeholder="Question"
-            {...register(`questions.${index}.question`)}
-          />
-
-          {[0, 1, 2, 3].map((option) => (
-            <Input
-              key={option}
-              placeholder={`Option ${option + 1}`}
-              {...register(`questions.${index}.options.${option}`)}
-            />
-          ))}
-
-          <select
-            {...register(`questions.${index}.correctAnswer`, {
-              valueAsNumber: true,
-            })}
-            className="w-full rounded-xl border border-slate-700 bg-slate-900 p-3 text-white"
+      {fields.map(
+        (field, index) => (
+          <Card
+            key={field.id}
           >
-            <option value={0}>Option 1</option>
-            <option value={1}>Option 2</option>
-            <option value={2}>Option 3</option>
-            <option value={3}>Option 4</option>
-          </select>
+            <div className="mb-8 flex items-center justify-between">
 
-          {fields.length > 1 && (
-            <Button
-              type="button"
-              variant="danger"
-              onClick={() => remove(index)}
-            >
-              Remove Question
-            </Button>
-          )}
-        </div>
-      ))}
+              <h2 className="text-2xl font-bold text-slate-900">
+                Question {index + 1}
+              </h2>
 
-      <Button
-        type="button"
-        variant="secondary"
-        onClick={() =>
-          append({
-            question: "",
-            options: ["", "", "", ""],
-            correctAnswer: 0,
-          })
-        }
-      >
-        + Add Question
-      </Button>
+              {fields.length >
+                1 && (
+                <Button
+                  type="button"
+                  variant="danger"
+                  onClick={() =>
+                    remove(index)
+                  }
+                >
+                  Remove
+                </Button>
+              )}
 
-      <Button
-        type="submit"
-        disabled={isSubmitting || createQuiz.isPending}
-      >
-        {createQuiz.isPending ? "Saving..." : "Save Quiz"}
-      </Button>
+            </div>
+
+            <div className="space-y-5">
+
+              <Input
+                placeholder="Question"
+                {...register(
+                  `questions.${index}.question`
+                )}
+              />
+
+              {[0, 1, 2, 3].map(
+                (option) => (
+                  <Input
+                    key={
+                      option
+                    }
+                    placeholder={`Option ${
+                      option +
+                      1
+                    }`}
+                    {...register(
+                      `questions.${index}.options.${option}`
+                    )}
+                  />
+                )
+              )}
+
+              <select
+                {...register(
+                  `questions.${index}.correctAnswer`,
+                  {
+                    valueAsNumber: true,
+                  }
+                )}
+                className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-700 focus:border-blue-500 focus:outline-none"
+              >
+                <option value={0}>
+                  Correct Answer
+                  : Option 1
+                </option>
+
+                <option value={1}>
+                  Correct Answer
+                  : Option 2
+                </option>
+
+                <option value={2}>
+                  Correct Answer
+                  : Option 3
+                </option>
+
+                <option value={3}>
+                  Correct Answer
+                  : Option 4
+                </option>
+
+              </select>
+
+            </div>
+
+          </Card>
+        )
+      )}
+
+      {/* Bottom Buttons */}
+
+      <div className="flex flex-wrap justify-between gap-4">
+
+        <Button
+          type="button"
+          variant="outline"
+          className="rounded-full px-8"
+          onClick={() =>
+            append({
+              question: "",
+              options: [
+                "",
+                "",
+                "",
+                "",
+              ],
+              correctAnswer: 0,
+            })
+          }
+        >
+          + Add Question
+        </Button>
+
+        <Button
+          type="submit"
+          className="rounded-full px-10"
+          disabled={
+            isSubmitting ||
+            createQuiz.isPending
+          }
+        >
+          {createQuiz.isPending
+            ? "Publishing..."
+            : "Publish Quiz"}
+        </Button>
+
+      </div>
+
     </form>
   );
 }

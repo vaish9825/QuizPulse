@@ -7,46 +7,34 @@ interface Props {
 export function Timer({
   seconds,
 }: Props) {
-  const [timeLeft, setTimeLeft] =
+  const [time, setTime] =
     useState(seconds);
 
   useEffect(() => {
-    setTimeLeft(seconds);
-  }, [seconds]);
-
-  useEffect(() => {
-    if (timeLeft <= 0) return;
+    setTime(seconds);
 
     const interval = setInterval(() => {
-      setTimeLeft((prev) => prev - 1);
+      setTime((prev) =>
+        prev > 0 ? prev - 1 : 0
+      );
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [timeLeft]);
+  }, [seconds]);
 
-  const percentage =
-    (timeLeft / seconds) * 100;
+  const danger = time <= 5;
 
   return (
-    <div className="mb-8">
-      <div className="mb-3 flex items-center justify-between">
-        <span className="text-lg font-semibold text-white">
-          Time Remaining
-        </span>
+    <div
+      className={`rounded-full px-5 py-2 text-lg font-bold shadow-sm
 
-        <span className="rounded-full bg-violet-600 px-5 py-2 text-2xl font-bold text-white">
-          {timeLeft}s
-        </span>
-      </div>
-
-      <div className="h-3 overflow-hidden rounded-full bg-slate-800">
-        <div
-          className="h-full bg-violet-500 transition-all duration-1000"
-          style={{
-            width: `${percentage}%`,
-          }}
-        />
-      </div>
+${
+  danger
+    ? "bg-red-100 text-red-700"
+    : "bg-indigo-100 text-indigo-700"
+}`}
+    >
+      ⏳ {time}s
     </div>
   );
 }

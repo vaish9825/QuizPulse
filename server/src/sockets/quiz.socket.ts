@@ -3,7 +3,7 @@ import { Server, Socket } from "socket.io";
 import { SOCKET_EVENTS } from "../common/constants/socket-events.js";
 
 import { startGame } from "../features/game/game.service.js";
-import { startQuestionTimer } from "../features/game/game.timer.js";
+import { startScheduler } from "../features/game/game.scheduler.js";
 
 export function registerQuizSocket(
   io: Server,
@@ -35,7 +35,7 @@ export function registerQuizSocket(
           SOCKET_EVENTS.QUIZ_STARTED
         );
 
-        startQuestionTimer(roomCode);
+        await startScheduler(roomCode);
       } catch (error) {
         console.error(error);
 

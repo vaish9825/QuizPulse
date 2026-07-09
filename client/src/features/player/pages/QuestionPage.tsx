@@ -1,64 +1,90 @@
-import { useCallback } from "react";
 import { useParams } from "react-router-dom";
-import { useQueryClient } from "@tanstack/react-query";
 
 import { Timer } from "@/shared/components/ui/Timer";
+import { Card } from "@/shared/components/ui/Card";
 
 import QuestionCard from "../components/QuestionCard";
-import Leaderboard from "../components/Leaderboard";
 
 import { useCurrentQuestion } from "../hooks/useCurrentQuestion";
-import { useLeaderboard } from "../hooks/useLeaderboard";
-import { useGameEvents } from "../hooks/useGameEvents";
 import { submitAnswer } from "../hooks/useSubmitAnswer";
+import { useGameEvents } from "../hooks/useGameEvents";
 
 export default function QuestionPage() {
   const { roomCode } = useParams();
 
-  const queryClient = useQueryClient();
-
-  const leaderboard = useLeaderboard();
-
-  const refreshQuestion = useCallback(() => {
-    queryClient.invalidateQueries({
-      queryKey: ["question", roomCode],
-    });
-  }, [queryClient, roomCode]);
-
-  useGameEvents(roomCode!, refreshQuestion);
-
   const {
     data,
     isLoading,
+    refetch,
   } = useCurrentQuestion(roomCode!);
+
+  useGameEvents(
+    roomCode!,
+    () => {
+      refetch();
+    }
+  );
 
   if (isLoading || !data) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-950 text-white">
-        Loading question...
+      <div className="flex min-h-screen items-center justify-center bg-slate-50">
+        Loading...
       </div>
     );
   }
 
+  const progress =
+    ((data.index + 1) /
+      data.totalQuestions) *
+    100;
+
   return (
-    <div className="min-h-screen bg-slate-950 px-8 py-10">
-      <Timer seconds={data.remainingTime} />
+    <div className="min-h-screen bg-slate-50 py-12">
+      <div className="mx-auto max-w-4xl px-6">
 
-      <QuestionCard
-        question={data.question}
-        options={data.options}
-        onAnswer={(answer) =>
-          submitAnswer(roomCode!, answer)
-        }
-      />
+        <div className="mb-8">
 
-      {leaderboard && (
-        <div className="mt-10">
-          <Leaderboard
-            players={leaderboard.leaderboard}
-          />
+          <div className="mb-3 flex items-center justify-between">
+
+            <span className="text-lg font-semibold text-slate-800">
+              Question {data.index + 1} /{" "}
+              {data.totalQuestions}
+            </span>
+
+            <Timer
+              seconds={data.remainingTime}
+            />
+
+          </div>
+
+          <div className="h-3 overflow-hidden rounded-full bg-slate-200">
+
+            <div
+              className="h-full rounded-full bg-indigo-600 transition-all duration-500"
+              style={{
+                width: `${progress}%`,
+              }}
+            />
+
+          </div>
+
         </div>
-      )}
+
+        <Card hover={false}>
+          <QuestionCard
+            key={data.index}
+            question={data.question}
+            options={data.options}
+            onAnswer={(answer) =>
+              submitAnswer(
+                roomCode!,
+                answer
+              )
+            }
+          />
+        </Card>
+
+      </div>
     </div>
   );
 }

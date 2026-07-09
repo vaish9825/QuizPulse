@@ -1,4 +1,5 @@
 import mongoose, { Schema } from "mongoose";
+import { GAME_STATUS } from "../game/game.constants.js";
 
 const PlayerSchema = new Schema(
   {
@@ -38,6 +39,8 @@ const RoomSchema = new Schema(
       type: String,
       unique: true,
       required: true,
+      uppercase: true,
+      trim: true,
     },
 
     quizId: {
@@ -53,8 +56,8 @@ const RoomSchema = new Schema(
 
     status: {
       type: String,
-      enum: ["waiting", "live", "finished"],
-      default: "waiting",
+      enum: Object.values(GAME_STATUS),
+      default: GAME_STATUS.WAITING,
     },
 
     currentQuestionIndex: {
@@ -88,4 +91,7 @@ const RoomSchema = new Schema(
   }
 );
 
-export const Room = mongoose.model("Room", RoomSchema);
+export const Room = mongoose.model(
+  "Room",
+  RoomSchema
+);
