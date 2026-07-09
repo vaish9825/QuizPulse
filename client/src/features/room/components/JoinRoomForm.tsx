@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
@@ -9,16 +9,26 @@ import { Input } from "@/shared/components/ui/Input";
 
 import { useJoinRoom } from "../hooks/useJoinRoom";
 
-export default function JoinRoomForm() {
+interface Props {
+  initialRoomCode?: string;
+}
+
+export default function JoinRoomForm({
+  initialRoomCode = "",
+}: Props) {
   const navigate = useNavigate();
 
   const joinRoom = useJoinRoom();
 
   const [roomCode, setRoomCode] =
-    useState("");
+    useState(initialRoomCode);
 
   const [nickname, setNickname] =
     useState("");
+
+  useEffect(() => {
+    setRoomCode(initialRoomCode);
+  }, [initialRoomCode]);
 
   async function handleJoin() {
     if (!roomCode || !nickname) {
@@ -61,41 +71,35 @@ export default function JoinRoomForm() {
   }
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-slate-50 p-8">
+    <div className="space-y-5">
 
-      <div className="space-y-5">
+      <Input
+        placeholder="Room Code"
+        value={roomCode}
+        onChange={(e) =>
+          setRoomCode(
+            e.target.value.toUpperCase()
+          )
+        }
+      />
 
-        <Input
-          placeholder="Room Code"
-          value={roomCode}
-          onChange={(e) =>
-            setRoomCode(
-              e.target.value.toUpperCase()
-            )
-          }
-        />
+      <Input
+        placeholder="Nickname"
+        value={nickname}
+        onChange={(e) =>
+          setNickname(e.target.value)
+        }
+      />
 
-        <Input
-          placeholder="Nickname"
-          value={nickname}
-          onChange={(e) =>
-            setNickname(
-              e.target.value
-            )
-          }
-        />
-
-        <Button
-          className="mt-3 w-full rounded-xl py-3"
-          onClick={handleJoin}
-          disabled={joinRoom.isPending}
-        >
-          {joinRoom.isPending
-            ? "Joining..."
-            : "Join Quiz"}
-        </Button>
-
-      </div>
+      <Button
+        className="w-full rounded-xl"
+        onClick={handleJoin}
+        disabled={joinRoom.isPending}
+      >
+        {joinRoom.isPending
+          ? "Joining..."
+          : "Join Room"}
+      </Button>
 
     </div>
   );

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { Timer } from "@/shared/components/ui/Timer";
@@ -22,8 +22,39 @@ export default function QuestionPage() {
   const [correctAnswer, setCorrectAnswer] =
     useState<number | null>(null);
 
+  const [remainingTime, setRemainingTime] =
+    useState(0);
+
+  const [paused, setPaused] =
+    useState(false);
+
+  useEffect(() => {
+    if (!data) return;
+
+    setRemainingTime(
+      data.remainingTime
+    );
+
+    setPaused(false);
+  }, [data]);
+
+  useEffect(() => {
+  if (paused) return;
+
+  if (remainingTime <= 0) return;
+
+  const timer = setInterval(() => {
+    setRemainingTime((prev) =>
+      prev > 0 ? prev - 1 : 0
+    );
+  }, 1000);
+
+  return () => clearInterval(timer);
+}, [paused, remainingTime]);
+
   useGameEvents({
     roomCode: roomCode!,
+
     refreshQuestion: () => {
       sessionStorage.removeItem(
         "leaderboard"
@@ -33,8 +64,19 @@ export default function QuestionPage() {
 
       refetch();
     },
+
     revealAnswer: (answer) => {
       setCorrectAnswer(answer);
+    },
+
+    onPause: () => {
+      setPaused(true);
+    },
+
+    onResume: (time) => {
+      setPaused(false);
+
+      setRemainingTime(time);
     },
   });
 
@@ -66,12 +108,19 @@ export default function QuestionPage() {
             </span>
 
             <Timer
-              seconds={data.remainingTime}
+              seconds={remainingTime}
+              paused={paused}
             />
 
           </div>
 
-          <div className="h-3 overflow-hidden rounded-full bg-slate-200">
+          {paused && (
+            <div className="mt-3 rounded-xl bg-yellow-100 px-4 py-2 text-center font-semibold text-yellow-800">
+              ⏸ Quiz paused by host
+            </div>
+          )}
+
+          <div className="mt-4 h-3 overflow-hidden rounded-full bg-slate-200">
 
             <div
               className="h-full rounded-full bg-indigo-600 transition-all duration-500"

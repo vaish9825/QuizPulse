@@ -3,7 +3,13 @@ import { Server, Socket } from "socket.io";
 import { SOCKET_EVENTS } from "../common/constants/socket-events.js";
 
 import { startGame } from "../features/game/game.service.js";
-import { startScheduler } from "../features/game/game.scheduler.js";
+
+import {
+  startScheduler,
+  pauseScheduler,
+  resumeScheduler,
+  endQuiz,
+} from "../features/game/game.scheduler.js";
 
 export function registerQuizSocket(
   io: Server,
@@ -12,24 +18,8 @@ export function registerQuizSocket(
   socket.on(
     SOCKET_EVENTS.START_QUIZ,
     async (roomCode: string) => {
-      console.log(
-        "✅ RECEIVED start-quiz:",
-        roomCode
-      );
-
       try {
-        const room = await startGame(
-          roomCode
-        );
-
-        console.log(
-          "✅ GAME STARTED"
-        );
-
-        console.log(
-          "📢 Emitting quiz-started to room:",
-          roomCode
-        );
+        await startGame(roomCode);
 
         io.to(roomCode).emit(
           SOCKET_EVENTS.QUIZ_STARTED
@@ -46,6 +36,69 @@ export function registerQuizSocket(
               error instanceof Error
                 ? error.message
                 : "Unable to start quiz",
+          }
+        );
+      }
+    }
+  );
+
+  socket.on(
+    SOCKET_EVENTS.PAUSE_QUIZ,
+    (roomCode: string) => {
+      try {
+        pauseScheduler(roomCode);
+      } catch (error) {
+        console.error(error);
+
+        socket.emit(
+          SOCKET_EVENTS.QUIZ_ERROR,
+          {
+            message:
+              error instanceof Error
+                ? error.message
+                : "Unable to pause quiz",
+          }
+        );
+      }
+    }
+  );
+
+  socket.on(
+    SOCKET_EVENTS.RESUME_QUIZ,
+    (roomCode: string) => {
+      try {
+        resumeScheduler(roomCode);
+      } catch (error) {
+        console.error(error);
+
+        socket.emit(
+          SOCKET_EVENTS.QUIZ_ERROR,
+          {
+            message:
+              error instanceof Error
+                ? error.message
+                : "Unable to resume quiz",
+          }
+        );
+      }
+    }
+  );
+
+  socket.on(
+    SOCKET_EVENTS.END_QUIZ,
+    async (roomCode: string) => {
+      try {
+        await endQuiz(roomCode);
+      } catch (error) {
+        console.error(error);
+
+        socket.emit(
+          SOCKET_EVENTS.QUIZ_ERROR,
+          {
+            message:
+              error instanceof Error
+                ? error.message
+                : "Unable to end quiz",
           }
         );
       }

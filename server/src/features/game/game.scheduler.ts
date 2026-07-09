@@ -14,30 +14,29 @@ import {
   isLastQuestion,
 } from "./game.service.js";
 
-const activeGames = new Map<
-  string,
-  NodeJS.Timeout
->();
+import {
+  getGameState,
+  setGameState,
+  deleteGameState,
+} from "./gameState.js";
 
 export async function startScheduler(
   roomCode: string
 ) {
   stopScheduler(roomCode);
 
-  await startQuestion(roomCode);
-}
+  const question =
+    await getCurrentQuestion(roomCode);
 
-function stopScheduler(roomCode: string) {
-  const timer = activeGames.get(roomCode);
-
-  if (timer) {
-    clearTimeout(timer);
-    activeGames.delete(roomCode);
-  }
+  await startQuestion(
+    roomCode,
+    question.remainingTime
+  );
 }
 
 async function startQuestion(
-  roomCode: string
+  roomCode: string,
+  duration: number
 ) {
   const io = getIO();
 
@@ -49,12 +48,155 @@ async function startQuestion(
     question
   );
 
+  const startedAt = Date.now();
+
   const timer = setTimeout(
     () => endQuestion(roomCode),
-    question.remainingTime * 1000
+    duration * 1000
   );
 
-  activeGames.set(roomCode, timer);
+  setGameState(roomCode, {
+    timer,
+    startedAt,
+    duration,
+    remainingTime: duration,
+  });
+}
+
+export async function pauseScheduler(
+  roomCode: string
+) {
+  const game =
+    getGameState(roomCode);
+
+  if (!game) return;
+
+  clearTimeout(game.timer);
+
+  const elapsed = Math.floor(
+    (Date.now() - game.startedAt) / 1000
+  );
+
+  game.remainingTime = Math.max(
+    game.duration - elapsed,
+    1
+  );
+
+  setGameState(roomCode, game);
+
+  const room =
+    await getRoom(roomCode);
+
+  room.status = GAME_STATUS.PAUSED;
+
+  await room.save();
+
+  const io = getIO();
+
+  io.to(roomCode).emit(
+    SOCKET_EVENTS.QUIZ_PAUSED
+  );
+
+  io.to(roomCode).emit(
+    SOCKET_EVENTS.PARTICIPANTS_UPDATED
+  );
+}
+
+export async function resumeScheduler(
+  roomCode: string
+) {
+  const game =
+    getGameState(roomCode);
+
+  if (!game) return;
+
+  const room =
+    await getRoom(roomCode);
+
+  // Restart elapsed time from now
+  room.currentQuestionStartedAt =
+    new Date();
+
+  room.status =
+    GAME_STATUS.LIVE;
+
+  await room.save();
+
+  const timer = setTimeout(
+    () => endQuestion(roomCode),
+    game.remainingTime * 1000
+  );
+
+  game.startedAt = Date.now();
+
+  game.duration =
+    game.remainingTime;
+
+  game.timer = timer;
+
+  setGameState(roomCode, game);
+
+  const io = getIO();
+
+  io.to(roomCode).emit(
+    SOCKET_EVENTS.QUIZ_RESUMED,
+    {
+      remainingTime:
+        game.remainingTime,
+    }
+  );
+
+  io.to(roomCode).emit(
+    SOCKET_EVENTS.PARTICIPANTS_UPDATED
+  );
+}
+
+export async function endQuiz(
+  roomCode: string
+) {
+  stopScheduler(roomCode);
+
+  const room =
+    await getRoom(roomCode);
+
+  room.status =
+    GAME_STATUS.FINISHED;
+
+  await room.save();
+
+  const leaderboard =
+    room.players
+      .slice()
+      .sort(
+        (a, b) =>
+          b.score - a.score
+      );
+
+  const io = getIO();
+
+  io.to(roomCode).emit(
+    SOCKET_EVENTS.PARTICIPANTS_UPDATED
+  );
+
+  io.to(roomCode).emit(
+    SOCKET_EVENTS.QUIZ_FINISHED,
+    {
+      leaderboard,
+    }
+  );
+}
+
+function stopScheduler(
+  roomCode: string
+) {
+  const game =
+    getGameState(roomCode);
+
+  if (game) {
+    clearTimeout(game.timer);
+
+    deleteGameState(roomCode);
+  }
 }
 
 async function endQuestion(
@@ -85,9 +227,6 @@ async function endQuestion(
           b.score - a.score
       );
 
-  // Phase 1
-  // Reveal answer
-
   io.to(roomCode).emit(
     SOCKET_EVENTS.QUESTION_ENDED,
     {
@@ -96,26 +235,20 @@ async function endQuestion(
     }
   );
 
-  // Phase 2
-  // After 3 sec show leaderboard
+  setTimeout(() => {
 
- setTimeout(() => {
+    io.to(roomCode).emit(
+      SOCKET_EVENTS.LEADERBOARD_UPDATED,
+      {
+        leaderboard,
+      }
+    );
 
-  io.to(roomCode).emit(
-    SOCKET_EVENTS.LEADERBOARD_UPDATED,
-    {
-      leaderboard,
-    }
-  );
+    io.to(roomCode).emit(
+      SOCKET_EVENTS.SHOW_LEADERBOARD
+    );
 
-  io.to(roomCode).emit(
-    SOCKET_EVENTS.SHOW_LEADERBOARD
-  );
-
-}, 3000);
-
-  // Phase 3
-  // After leaderboard duration move ahead
+  }, 3000);
 
   setTimeout(
     () => advance(roomCode),
@@ -126,37 +259,25 @@ async function endQuestion(
 async function advance(
   roomCode: string
 ) {
-  const io = getIO();
-
   const room =
     await getRoom(roomCode);
 
   if (isLastQuestion(room)) {
 
-    room.status =
-      GAME_STATUS.FINISHED;
-
-    await room.save();
-
-    stopScheduler(roomCode);
-
-    io.to(roomCode).emit(
-      SOCKET_EVENTS.QUIZ_FINISHED,
-      {
-        leaderboard:
-          room.players
-            .slice()
-            .sort(
-              (a, b) =>
-                b.score - a.score
-            ),
-      }
-    );
+    await endQuiz(roomCode);
 
     return;
   }
 
   await nextQuestion(roomCode);
 
-  await startQuestion(roomCode);
+  const question =
+    await getCurrentQuestion(
+      roomCode
+    );
+
+  await startQuestion(
+    roomCode,
+    question.remainingTime
+  );
 }

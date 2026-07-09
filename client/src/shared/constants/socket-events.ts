@@ -9,6 +9,14 @@ export const SOCKET_EVENTS = {
   START_QUIZ: "start-quiz",
   QUIZ_STARTED: "quiz-started",
 
+  PAUSE_QUIZ: "pause-quiz",
+  QUIZ_PAUSED: "quiz-paused",
+
+  RESUME_QUIZ: "resume-quiz",
+  QUIZ_RESUMED: "quiz-resumed",
+
+  END_QUIZ: "end-quiz",
+
   // Game
   SUBMIT_ANSWER: "submit-answer",
 

@@ -1,6 +1,7 @@
 import { Room } from "../room/room.model.js";
 import { GAME_STATUS } from "./game.constants.js";
 import type { SubmitAnswerPayload } from "./game.types.js";
+import { getGameState } from "./gameState.js";
 
 export async function startGame(roomCode: string) {
   const room = await Room.findOne({
@@ -41,36 +42,30 @@ export async function getCurrentQuestion(
     throw new Error("Question not found");
   }
 
-  const duration =
-    question.timeLimit ??
-    room.questionDuration;
+const duration =
+  question.timeLimit ??
+  room.questionDuration;
 
-  const elapsed = Math.floor(
-    (Date.now() -
-      new Date(
-        room.currentQuestionStartedAt!
-      ).getTime()) /
-      1000
-  );
+const game =
+  getGameState(roomCode);
 
-  return {
-    index: room.currentQuestionIndex,
+return {
+  index: room.currentQuestionIndex,
 
-    totalQuestions:
-      quiz.questions.length,
+  totalQuestions:
+    quiz.questions.length,
 
-    question: question.question,
+  question: question.question,
 
-    options: question.options,
+  options: question.options,
 
+  duration,
+
+  remainingTime:
+    game?.remainingTime ??
     duration,
-
-    remainingTime: Math.max(
-      duration - elapsed,
-      0
-    ),
-  };
-}
+};
+} 
 
 export async function submitAnswer(
   payload: SubmitAnswerPayload

@@ -6,9 +6,17 @@ import { SOCKET_EVENTS } from "@/shared/constants/socket-events";
 
 interface Props {
   roomCode: string;
+
   refreshQuestion?: () => void;
+
   revealAnswer?: (
     correctAnswer: number
+  ) => void;
+
+  onPause?: () => void;
+
+  onResume?: (
+    remainingTime: number
   ) => void;
 }
 
@@ -16,11 +24,13 @@ export function useGameEvents({
   roomCode,
   refreshQuestion,
   revealAnswer,
+  onPause,
+  onResume,
 }: Props) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Reveal answer
+
     const onQuestionEnded = (
       payload: {
         correctAnswer: number;
@@ -31,7 +41,6 @@ export function useGameEvents({
       );
     };
 
-    // Cache leaderboard as soon as server sends it
     const onLeaderboardUpdated = (
       payload: any
     ) => {
@@ -41,15 +50,28 @@ export function useGameEvents({
       );
     };
 
-    // Navigate only when server says so
     const onShowLeaderboard = () => {
       navigate(
         `/play/${roomCode}/leaderboard`
       );
     };
 
-    // Next question
+    const handlePause = () => {
+      onPause?.();
+    };
+
+    const handleResume = (
+      payload: {
+        remainingTime: number;
+      }
+    ) => {
+      onResume?.(
+        payload.remainingTime
+      );
+    };
+
     const onNextQuestion = () => {
+
       sessionStorage.removeItem(
         "leaderboard"
       );
@@ -61,10 +83,10 @@ export function useGameEvents({
       );
     };
 
-    // Quiz finished
     const onQuizFinished = (
       payload: any
     ) => {
+
       sessionStorage.setItem(
         "finalLeaderboard",
         JSON.stringify(
@@ -93,6 +115,16 @@ export function useGameEvents({
     );
 
     socket.on(
+      SOCKET_EVENTS.QUIZ_PAUSED,
+      handlePause
+    );
+
+    socket.on(
+      SOCKET_EVENTS.QUIZ_RESUMED,
+      handleResume
+    );
+
+    socket.on(
       SOCKET_EVENTS.NEXT_QUESTION,
       onNextQuestion
     );
@@ -103,6 +135,7 @@ export function useGameEvents({
     );
 
     return () => {
+
       socket.off(
         SOCKET_EVENTS.QUESTION_ENDED,
         onQuestionEnded
@@ -119,6 +152,16 @@ export function useGameEvents({
       );
 
       socket.off(
+        SOCKET_EVENTS.QUIZ_PAUSED,
+        handlePause
+      );
+
+      socket.off(
+        SOCKET_EVENTS.QUIZ_RESUMED,
+        handleResume
+      );
+
+      socket.off(
         SOCKET_EVENTS.NEXT_QUESTION,
         onNextQuestion
       );
@@ -127,11 +170,15 @@ export function useGameEvents({
         SOCKET_EVENTS.QUIZ_FINISHED,
         onQuizFinished
       );
+
     };
+
   }, [
     roomCode,
     navigate,
     refreshQuestion,
     revealAnswer,
+    onPause,
+    onResume,
   ]);
 }

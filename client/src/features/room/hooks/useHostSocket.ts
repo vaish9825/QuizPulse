@@ -53,3 +53,30 @@ export function startQuiz(
     roomCode
   );
 }
+
+export function pauseQuiz(
+  roomCode: string
+) {
+  socket.emit(
+    SOCKET_EVENTS.PAUSE_QUIZ,
+    roomCode
+  );
+}
+
+export function resumeQuiz(
+  roomCode: string
+) {
+  socket.emit(
+    SOCKET_EVENTS.RESUME_QUIZ,
+    roomCode
+  );
+}
+
+export function endQuiz(
+  roomCode: string
+) {
+  socket.emit(
+    SOCKET_EVENTS.END_QUIZ,
+    roomCode
+  );
+}

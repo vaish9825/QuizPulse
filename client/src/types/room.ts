@@ -20,6 +20,13 @@ export interface Quiz {
   questions: Question[];
 }
 
+export type RoomStatus =
+  | "waiting"
+  | "live"
+  | "paused"
+  | "leaderboard"
+  | "finished";
+
 export interface Room {
   _id: string;
 
@@ -27,7 +34,7 @@ export interface Room {
 
   hostId: string;
 
-  status: "waiting" | "live" | "finished";
+  status: RoomStatus;
 
   currentQuestionIndex: number;
 
