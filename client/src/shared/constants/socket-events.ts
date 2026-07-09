@@ -11,9 +11,15 @@ export const SOCKET_EVENTS = {
 
   // Game
   SUBMIT_ANSWER: "submit-answer",
-  LEADERBOARD_UPDATED: "leaderboard-updated",
+
   NEXT_QUESTION: "next-question",
+
   QUESTION_ENDED: "question-ended",
+
+  SHOW_LEADERBOARD: "show-leaderboard",
+
+  LEADERBOARD_UPDATED: "leaderboard-updated",
+
   QUIZ_FINISHED: "quiz-finished",
 
   // Errors

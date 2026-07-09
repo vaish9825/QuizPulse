@@ -70,32 +70,56 @@ async function endQuestion(
 
   await room.save();
 
+  const quiz = room.quizId as any;
+
+  const currentQuestion =
+    quiz.questions[
+      room.currentQuestionIndex
+    ];
+
   const leaderboard =
     room.players
       .slice()
       .sort(
-        (a, b) => b.score - a.score
+        (a, b) =>
+          b.score - a.score
       );
 
-  // Navigate everyone first
+  // Phase 1
+  // Reveal answer
+
   io.to(roomCode).emit(
-    SOCKET_EVENTS.QUESTION_ENDED
+    SOCKET_EVENTS.QUESTION_ENDED,
+    {
+      correctAnswer:
+        currentQuestion.correctAnswer,
+    }
   );
 
-  // Give React time to mount LeaderboardPage
-  setTimeout(() => {
-    io.to(roomCode).emit(
-      SOCKET_EVENTS.LEADERBOARD_UPDATED,
-      {
-        leaderboard,
-      }
-    );
-  }, 200);
+  // Phase 2
+  // After 3 sec show leaderboard
 
-  // Advance after leaderboard screen
+ setTimeout(() => {
+
+  io.to(roomCode).emit(
+    SOCKET_EVENTS.LEADERBOARD_UPDATED,
+    {
+      leaderboard,
+    }
+  );
+
+  io.to(roomCode).emit(
+    SOCKET_EVENTS.SHOW_LEADERBOARD
+  );
+
+}, 3000);
+
+  // Phase 3
+  // After leaderboard duration move ahead
+
   setTimeout(
     () => advance(roomCode),
-    LEADERBOARD_TIME * 1000
+    (LEADERBOARD_TIME + 3) * 1000
   );
 }
 
@@ -108,6 +132,7 @@ async function advance(
     await getRoom(roomCode);
 
   if (isLastQuestion(room)) {
+
     room.status =
       GAME_STATUS.FINISHED;
 
@@ -122,7 +147,8 @@ async function advance(
           room.players
             .slice()
             .sort(
-              (a, b) => b.score - a.score
+              (a, b) =>
+                b.score - a.score
             ),
       }
     );

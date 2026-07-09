@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { Timer } from "@/shared/components/ui/Timer";
@@ -18,12 +19,24 @@ export default function QuestionPage() {
     refetch,
   } = useCurrentQuestion(roomCode!);
 
-  useGameEvents(
-    roomCode!,
-    () => {
+  const [correctAnswer, setCorrectAnswer] =
+    useState<number | null>(null);
+
+  useGameEvents({
+    roomCode: roomCode!,
+    refreshQuestion: () => {
+      sessionStorage.removeItem(
+        "leaderboard"
+      );
+
+      setCorrectAnswer(null);
+
       refetch();
-    }
-  );
+    },
+    revealAnswer: (answer) => {
+      setCorrectAnswer(answer);
+    },
+  });
 
   if (isLoading || !data) {
     return (
@@ -40,6 +53,7 @@ export default function QuestionPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 py-12">
+
       <div className="mx-auto max-w-4xl px-6">
 
         <div className="mb-8">
@@ -71,10 +85,12 @@ export default function QuestionPage() {
         </div>
 
         <Card hover={false}>
+
           <QuestionCard
             key={data.index}
             question={data.question}
             options={data.options}
+            correctAnswer={correctAnswer}
             onAnswer={(answer) =>
               submitAnswer(
                 roomCode!,
@@ -82,9 +98,11 @@ export default function QuestionPage() {
               )
             }
           />
+
         </Card>
 
       </div>
+
     </div>
   );
 }
