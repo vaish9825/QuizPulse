@@ -1,55 +1,58 @@
-import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 
-import { socket } from "@/lib/socket";
-import { SOCKET_EVENTS } from "@/shared/constants/socket-events";
+import { Card } from "@/shared/components/ui/Card";
+import { Container } from "@/shared/components/layout/Container";
 
-import type {
-  LeaderboardData,
-} from "../types/leaderboard.types";
+import Leaderboard from "../components/Leaderboard";
+import { useLeaderboard } from "../hooks/useLeaderboard";
+import { useGameEvents } from "../hooks/useGameEvents";
 
-export function useLeaderboard() {
-  const [data, setData] =
-    useState<LeaderboardData | null>(() => {
-      const cached =
-        sessionStorage.getItem(
-          "leaderboard"
-        );
+export default function LeaderboardPage() {
+  const { roomCode } = useParams();
 
-      return cached
-        ? JSON.parse(cached)
-        : null;
-    });
+  useGameEvents({
+    roomCode: roomCode!,
+  });
 
-  useEffect(() => {
+  const leaderboard =
+    useLeaderboard();
 
-    const onLeaderboardUpdated = (
-      payload: LeaderboardData
-    ) => {
-
-      sessionStorage.setItem(
-        "leaderboard",
-        JSON.stringify(payload)
-      );
-
-      setData(payload);
-
-    };
-
-    socket.on(
-      SOCKET_EVENTS.LEADERBOARD_UPDATED,
-      onLeaderboardUpdated
+  if (!leaderboard) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-slate-50 text-lg font-medium text-slate-600">
+        Loading leaderboard...
+      </div>
     );
+  }
 
-    return () => {
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 via-slate-50 to-white py-16">
 
-      socket.off(
-        SOCKET_EVENTS.LEADERBOARD_UPDATED,
-        onLeaderboardUpdated
-      );
+      <Container>
 
-    };
+        <div className="mx-auto max-w-5xl">
 
-  }, []);
+          <h1 className="mb-12 text-center text-6xl font-extrabold text-slate-900">
+            🏆 Leaderboard
+          </h1>
 
-  return data;
+          <Card
+            hover={false}
+            className="p-10"
+          >
+
+            <Leaderboard
+              players={
+                leaderboard.leaderboard
+              }
+            />
+
+          </Card>
+
+        </div>
+
+      </Container>
+
+    </div>
+  );
 }
