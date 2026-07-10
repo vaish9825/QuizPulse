@@ -131,8 +131,8 @@ track real-time leaderboards and let participants join instantly.
   },
   {
     icon: "🤖",
-    title: "AI Quiz Generator",
-    desc: "Generate quizzes from any topic in seconds.",
+    title: "AI Quiz Creation",
+    desc: "Generate quizzes from topics or PDFs in seconds.",
   },
   {
     icon: "📱",
@@ -352,7 +352,7 @@ className="py-16"
       </h4>
 
       <p className="mt-4 leading-7 text-slate-600">
-        Generate an entire quiz from any topic in seconds using Gemini AI.
+        Generate an entire quiz from any topic or PDFs in seconds using Gemini AI.
       </p>
 
       <Button

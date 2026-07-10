@@ -5,7 +5,7 @@ import { Container } from "@/shared/components/layout/Container";
 import { PageHeader } from "@/shared/components/layout/PageHeader";
 import { Card } from "@/shared/components/ui/Card";
 import { Button } from "@/shared/components/ui/Button";
-import { Badge } from "@/shared/components/ui/Badge";
+import { useGeneratePdfQuiz } from "../hooks/useGeneratePdfQuiz";
 
 import { useGenerateQuiz } from "../hooks/useGenerateQuiz";
 import { useCreateRoom } from "@/features/room/hooks/useCreateRoom";
@@ -14,6 +14,15 @@ export default function AiQuizPage() {
   const navigate = useNavigate();
 
   const mutation = useGenerateQuiz();
+  const pdfMutation =
+  useGeneratePdfQuiz();
+
+const [mode, setMode] = useState<
+  "topic" | "pdf"
+>("topic");
+
+const [file, setFile] =
+  useState<File | null>(null);
 
   const createRoom = useCreateRoom();
 
@@ -48,6 +57,23 @@ export default function AiQuizPage() {
     }
   }
 
+  async function handlePdfGenerate() {
+  if (!file) return;
+
+  try {
+    const quiz = await pdfMutation.mutateAsync({
+      file,
+      difficulty,
+      questions,
+    });
+
+    setGeneratedQuiz(quiz);
+
+  } catch (err) {
+    console.error(err);
+  }
+}
+
   async function handleStartLive() {
     if (!generatedQuiz) return;
 
@@ -79,19 +105,24 @@ export default function AiQuizPage() {
   }
 
   function handleGenerateAnother() {
-    setGeneratedQuiz(null);
-    setTopic("");
-    setDifficulty("easy");
-    setQuestions(10);
-  }
+  setGeneratedQuiz(null);
 
-  return (<div className="min-h-screen bg-slate-50 py-16">
+  setTopic("");
+  setFile(null);
+
+  setDifficulty("easy");
+  setQuestions(10);
+
+  setMode("topic");
+}
+
+  return (<div className="min-h-screen bg-gradient-to-b from-blue-50 via-slate-50 to-white py-16">
 
   <Container>
 
     <PageHeader
       title="AI Quiz Generator"
-      subtitle="Generate an entire quiz from any topic."
+      subtitle="Generate quizzes from a topic or upload lecture notes as a PDF."
     />
 
     {!generatedQuiz ? (
@@ -101,84 +132,232 @@ export default function AiQuizPage() {
         className="mx-auto mt-10 max-w-2xl p-10"
       >
 
-        <div className="space-y-6">
+        <div className="mb-8 flex rounded-xl bg-slate-100 p-1">
 
-          <div>
+  <button
+    className={`flex-1 rounded-lg py-3 font-semibold transition ${
+      mode === "topic"
+        ? "bg-white shadow"
+        : ""
+    }`}
+    onClick={() =>
+      setMode("topic")
+    }
+  >
+    Topic
+  </button>
 
-            <label className="mb-2 block font-semibold">
-              Topic
-            </label>
+  <button
+    className={`flex-1 rounded-lg py-3 font-semibold transition ${
+      mode === "pdf"
+        ? "bg-white shadow"
+        : ""
+    }`}
+    onClick={() =>
+      setMode("pdf")
+    }
+  >
+    PDF
+  </button>
 
-            <input
-              className="w-full rounded-xl border p-3"
-              placeholder="Operating Systems"
-              value={topic}
-              onChange={(e) =>
-                setTopic(e.target.value)
-              }
-            />
+</div>
 
-          </div>
+        {mode === "topic" && (
 
-          <div>
+<div className="space-y-6">
 
-            <label className="mb-2 block font-semibold">
-              Difficulty
-            </label>
+  <div>
 
-            <select
-              className="w-full rounded-xl border p-3"
-              value={difficulty}
-              onChange={(e) =>
-                setDifficulty(
-                  e.target.value as
-                    | "easy"
-                    | "medium"
-                    | "hard"
-                )
-              }
-            >
+    <label className="mb-2 block font-semibold">
+      Topic
+    </label>
 
-              <option>easy</option>
-              <option>medium</option>
-              <option>hard</option>
+    <input
+      className="w-full rounded-xl border p-3"
+      placeholder="Operating Systems"
+      value={topic}
+      onChange={(e) =>
+        setTopic(e.target.value)
+      }
+    />
 
-            </select>
+  </div>
 
-          </div>
+  <div>
 
-          <div>
+    <label className="mb-2 block font-semibold">
+      Difficulty
+    </label>
 
-            <label className="mb-2 block font-semibold">
-              Questions
-            </label>
+    <select
+      className="w-full rounded-xl border p-3"
+      value={difficulty}
+      onChange={(e) =>
+        setDifficulty(
+          e.target.value as any
+        )
+      }
+    >
+      <option>easy</option>
+      <option>medium</option>
+      <option>hard</option>
+    </select>
 
-            <input
-              type="number"
-              min={2}
-              max={30}
-              className="w-full rounded-xl border p-3"
-              value={questions}
-              onChange={(e) =>
-                setQuestions(
-                  Number(e.target.value)
-                )
-              }
-            />
+  </div>
 
-          </div>
+  <div>
 
-          <Button
-            className="w-full"
-            disabled={mutation.isPending}
-            onClick={handleGenerate}
-          >
-            {mutation.isPending
-              ? "Generating..."
-              : "Generate Quiz"}
-          </Button>
+    <label className="mb-2 block font-semibold">
+      Questions
+    </label>
 
-        </div>
+    <input
+      type="number"
+      min={2}
+      max={30}
+      className="w-full rounded-xl border p-3"
+      value={questions}
+      onChange={(e) =>
+        setQuestions(
+          Number(e.target.value)
+        )
+      }
+    />
+
+  </div>
+
+  <Button
+    className="w-full"
+    disabled={mutation.isPending}
+    onClick={handleGenerate}
+  >
+    {mutation.isPending
+      ? "Generating..."
+      : "Generate Quiz"}
+  </Button>
+
+</div>
+
+)}
+      {mode === "pdf" && (
+
+<div className="space-y-6">
+
+  <div>
+
+  <label className="mb-3 block font-semibold">
+    Upload PDF
+  </label>
+
+  <label
+    htmlFor="pdf-upload"
+    className="flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-blue-200 bg-blue-50/40 px-8 py-12 transition hover:border-blue-400 hover:bg-blue-50"
+  >
+
+    <div className="mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-white shadow">
+
+      <span className="text-5xl">
+        📄
+      </span>
+
+    </div>
+
+    <h3 className="text-2xl font-bold text-slate-900">
+      Drag & Drop your PDF
+    </h3>
+
+    <p className="mt-2 text-slate-500">
+      or click below to browse your files
+    </p>
+
+    <div className="mt-8 rounded-xl bg-white px-6 py-3 font-semibold text-blue-600 shadow-sm transition hover:shadow">
+
+      Choose PDF File
+
+    </div>
+
+    <p className="mt-6 text-sm text-slate-400">
+      Supports PDF files up to 20MB
+    </p>
+
+    {file && (
+      <div className="mt-6 rounded-xl bg-green-100 px-5 py-3 font-medium text-green-700">
+        ✅ {file.name}
+      </div>
+    )}
+
+  </label>
+
+  <input
+    id="pdf-upload"
+    hidden
+    type="file"
+    accept=".pdf"
+    onChange={(e) =>
+      setFile(
+        e.target.files?.[0] ?? null
+      )
+    }
+  />
+
+</div>
+
+  <div>
+
+    <label className="mb-2 block font-semibold">
+      Difficulty
+    </label>
+
+    <select
+      className="w-full rounded-xl border p-3"
+      value={difficulty}
+      onChange={(e) =>
+        setDifficulty(
+          e.target.value as any
+        )
+      }
+    >
+      <option>easy</option>
+      <option>medium</option>
+      <option>hard</option>
+    </select>
+
+  </div>
+
+  <div>
+
+    <label className="mb-2 block font-semibold">
+      Questions
+    </label>
+
+    <input
+      type="number"
+      min={2}
+      max={30}
+      className="w-full rounded-xl border p-3"
+      value={questions}
+      onChange={(e) =>
+        setQuestions(
+          Number(e.target.value)
+        )
+      }
+    />
+
+  </div>
+
+  <Button
+    className="w-full"
+    disabled={pdfMutation.isPending}
+    onClick={handlePdfGenerate}
+  >
+    {pdfMutation.isPending
+      ? "Generating..."
+      : "Generate Quiz from PDF"}
+  </Button>
+
+</div>
+
+)}
 
       </Card>
 
@@ -189,87 +368,84 @@ export default function AiQuizPage() {
         className="mx-auto mt-10 max-w-2xl p-10 text-center"
       >
 
-        <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-green-100 text-4xl">
 
-          ✅
+        <h2 className="mt-8 text-3xl font-extrabold tracking-tight text-slate-800">
 
-        </div>
+  Quiz Created Successfully
 
-        <h2 className="mt-6 text-3xl font-bold">
+</h2>
 
-          Quiz Created Successfully
 
-        </h2>
+        <div
+  className="
+    mt-10
+    rounded-3xl
+    border
+    border-blue-100
+    bg-white
+    p-8
+    shadow-xl
+  "
+>
 
-        <p className="mt-3 text-slate-600">
 
-          Your AI quiz has been generated and saved.
+  <h3 className="text-2xl font-bold text-slate-900">
 
-        </p>
+    {generatedQuiz.title}
 
-        <div className="mt-8 rounded-2xl border bg-slate-50 p-6">
+  </h3>
 
-          <h3 className="text-2xl font-bold">
+  <p className="mx-auto mt-4 max-w-xl text-s leading-8 text-slate-600">
 
-            {generatedQuiz.title}
+    {generatedQuiz.description}
 
-          </h3>
+  </p>
 
-          <p className="mt-3 text-slate-600">
+  <div className="mt-8 flex flex-wrap justify-center gap-4">
 
-            {generatedQuiz.description}
+  <div className="rounded-full bg-blue-100 px-4 py-2 text-sm font-semibold text-blue-700">
+    {generatedQuiz.difficulty}
+  </div>
 
-          </p>
+  <div className="rounded-full bg-indigo-100 px-4 py-2 text-sm font-semibold text-indigo-700">
+    {generatedQuiz.questions.length} Questions
+  </div>
 
-          <div className="mt-5 flex justify-center gap-3">
+  <div className="rounded-full bg-green-100 px-4 py-2 text-sm font-semibold text-green-700">
+    AI Generated
+  </div>
 
-            <Badge>
+</div>
 
-              {generatedQuiz.difficulty}
+</div>
 
-            </Badge>
+        <div className="mt-10 flex flex-wrap justify-center gap-5">
 
-            <Badge>
+  <Button
+    className="min-w-[150px] rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 py-3 text-white shadow-lg transition-all duration-200 hover:-translate-y-1 hover:shadow-xl"
+    onClick={handleStartLive}
+    disabled={createRoom.isPending}
+  >
+    {createRoom.isPending
+      ? "Creating Room..."
+      : "Start Live Quiz"}
+  </Button>
 
-              {generatedQuiz.questions.length}
-              {" "}Questions
+  <Button
+    className="min-w-[150px] rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 py-3 text-white shadow-lg transition-all duration-200 hover:-translate-y-1 hover:shadow-xl"
+    onClick={handleMyQuizzes}
+  >
+    View My Quizzes
+  </Button>
 
-            </Badge>
+  <Button
+    className="min-w-[150px] rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 py-3 text-white shadow-lg transition-all duration-200 hover:-translate-y-1 hover:shadow-xl"
+    onClick={handleGenerateAnother}
+  >
+    Generate Another
+  </Button>
 
-          </div>
-
-        </div>
-
-        <div className="mt-10 flex flex-wrap justify-center gap-4">
-
-          <Button
-            onClick={handleStartLive}
-            disabled={
-              createRoom.isPending
-            }
-          >
-            {createRoom.isPending
-              ? "Creating Room..."
-              : "Start Live"}
-          </Button>
-
-          <Button
-            variant="outline"
-            onClick={handleMyQuizzes}
-          >
-            Go to My Quizzes
-          </Button>
-
-          <Button
-            variant="secondary"
-            onClick={
-              handleGenerateAnother
-            }
-          >
-            Generate Another
-          </Button>
-
-        </div>
+</div>
 
       </Card>
 
