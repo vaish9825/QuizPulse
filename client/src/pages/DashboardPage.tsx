@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ChevronDown } from "lucide-react";
 
 import { Button } from "@/shared/components/ui/Button";
 import { Card } from "@/shared/components/ui/Card";
@@ -10,8 +12,13 @@ import JoinRoomForm from "@/features/room/components/JoinRoomForm";
 import { useQuizzes } from "@/hooks/useQuizzes";
 import { Spinner } from "@/shared/components/ui/Spinner";
 
+
+
 export default function DashboardPage() {
   const navigate = useNavigate();
+
+  const [showCreateMenu, setShowCreateMenu] =
+  useState(false);
 
   const { data, isLoading } = useQuizzes();
 
@@ -35,7 +42,7 @@ export default function DashboardPage() {
           <div className="flex min-h-[82vh] flex-col items-center justify-center text-center">
 
             <span className="rounded-full bg-blue-100 px-5 py-2 text-sm font-semibold text-blue-600">
-              🚀 Real-Time Quiz Platform
+              🚀 Real-Time Multiplayer Quiz Platform
             </span>
 
             <h1 className="mt-8 max-w-4xl text-6xl font-extrabold leading-tight text-slate-900">
@@ -48,36 +55,43 @@ export default function DashboardPage() {
             </h1>
 
             <p className="mt-8 max-w-2xl text-xl leading-8 text-slate-600">
-              Create engaging quizzes, host live sessions,
-              track leaderboards in real time and let
-              participants join instantly.
+              Create quizzes manually or with AI, host live sessions,
+track real-time leaderboards and let participants join instantly.
             </p>
 
-            <div className="mt-10 flex gap-5">
+<div className="mt-10 flex flex-wrap justify-center gap-5">
 
-              <Button
-                size="lg"
-                className="rounded-full px-8"
-                onClick={() => navigate("/create")}
-              >
-                Create Quiz
-              </Button>
+  <Button
+    size="lg"
+    className="min-w-[170px] rounded-full"
+    onClick={() => navigate("/create")}
+  >
+    Create Quiz
+  </Button>
 
-              <Button
-                size="lg"
-                variant="outline"
-                onClick={() => {
-                  document
-                    .getElementById("join")
-                    ?.scrollIntoView({
-                      behavior: "smooth",
-                    });
-                }}
-              >
-                Join Quiz
-              </Button>
+  <Button
+    size="lg"
+    className="min-w-[170px] rounded-full"
+    onClick={() => navigate("/ai")}
+  >
+    AI Quiz
+  </Button>
 
-            </div>
+  <Button
+    size="lg"
+    className="min-w-[170px] rounded-full"
+    onClick={() => {
+      document
+        .getElementById("join")
+        ?.scrollIntoView({
+          behavior: "smooth",
+        });
+    }}
+  >
+    Join Quiz
+  </Button>
+
+</div>
 
           </div>
 
@@ -153,6 +167,8 @@ export default function DashboardPage() {
   </section>
 </Container>
 
+
+
         {/* JOIN */}
 
 <Container>
@@ -200,60 +216,165 @@ className="py-16"
 </Container>
 
 
-
       {/* QUIZZES */}
 
       <Container>
 
-        <section className="pt-6 pb-16">
+        <section  id="my-quizzes" className="pt-6 pb-16">
 
           <div className="mb-8 flex items-center justify-between">
 
             <h2 className="text-4xl font-bold text-slate-900">
-              Your Quizzes
+              My Quizzes
             </h2>
 
-            <Button
-              onClick={() => navigate("/create")}
-            >
-              + New Quiz
-            </Button>
+            <div className="relative">
+
+  <Button
+    onClick={() =>
+      setShowCreateMenu(!showCreateMenu)
+    }
+    className="flex items-center gap-2"
+  >
+    + New Quiz
+
+    <ChevronDown size={16} />
+
+  </Button>
+
+  {showCreateMenu && (
+
+    <div className="absolute right-0 mt-2 w-64 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl">
+
+      <button
+        className="block w-full px-5 py-4 text-left transition hover:bg-slate-50"
+        onClick={() => {
+          setShowCreateMenu(false);
+          navigate("/create");
+        }}
+      >
+
+        <p className="font-semibold">
+          Manual Quiz
+        </p>
+
+        <p className="text-sm text-slate-500">
+          Create your own questions
+        </p>
+
+      </button>
+
+      <button
+        className="block w-full border-t px-5 py-4 text-left transition hover:bg-slate-50"
+        onClick={() => {
+          setShowCreateMenu(false);
+          navigate("/ai");
+        }}
+      >
+
+        <p className="font-semibold">
+          AI Quiz
+        </p>
+
+        <p className="text-sm text-slate-500">
+          Generate with Gemini AI
+        </p>
+
+      </button>
+
+    </div>
+
+  )}
+
+</div>
 
           </div>
 
           {data && data.length > 0 ? (
             <QuizList quizzes={data} />
           ) : (
-            <Card hover={false}>
-              <div className="py-16 text-center">
+            <Card
+  hover={false}
+  className="p-12"
+>
 
-                <h3 className="text-2xl font-bold text-slate-900">
-                  No quizzes yet
-                </h3>
+  <div className="text-center">
 
-                <p className="mt-3 text-slate-500">
-                  Create your first quiz to begin.
-                </p>
+    <h3 className="text-3xl font-bold text-slate-900">
+      No quizzes yet
+    </h3>
 
-                <div className="mt-8">
+    <p className="mt-3 text-lg text-slate-500">
+      Choose how you'd like to create your first quiz.
+    </p>
 
-                  <Button
-                    onClick={() =>
-                      navigate("/create")
-                    }
-                  >
-                    Create Quiz
-                  </Button>
+  </div>
 
-                </div>
+  <div className="mt-12 grid gap-8 md:grid-cols-2">
 
-              </div>
-            </Card>
+    {/* Manual Quiz */}
+
+    <Card className="p-8">
+
+      <div className="text-5xl">
+        📝
+      </div>
+
+      <h4 className="mt-6 text-2xl font-bold">
+        Manual Quiz
+      </h4>
+
+      <p className="mt-4 leading-7 text-slate-600">
+        Build your quiz question by question with complete control.
+      </p>
+
+      <Button
+        className="mt-8 w-full"
+        onClick={() =>
+          navigate("/create")
+        }
+      >
+        Create Quiz
+      </Button>
+
+    </Card>
+
+    {/* AI Quiz */}
+
+    <Card className="border-blue-200 bg-blue-50 p-8">
+
+      <div className="text-5xl">
+        🤖
+      </div>
+
+      <h4 className="mt-6 text-2xl font-bold">
+        AI Quiz
+      </h4>
+
+      <p className="mt-4 leading-7 text-slate-600">
+        Generate an entire quiz from any topic in seconds using Gemini AI.
+      </p>
+
+      <Button
+        className="mt-8 w-full"
+        onClick={() =>
+          navigate("/ai")
+        }
+      >
+        Generate AI Quiz
+      </Button>
+
+    </Card>
+
+  </div>
+
+</Card>
           )}
 
         </section>
 
       </Container>
+
    <Container>
   <FAQ />
 </Container>

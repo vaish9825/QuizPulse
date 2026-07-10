@@ -18,6 +18,7 @@ export default function QuizList({
           description={quiz.description}
           difficulty={quiz.difficulty}
           questionCount={quiz.questions.length}
+          source={quiz.source}
         />
       ))}
     </div>

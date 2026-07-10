@@ -1,4 +1,14 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import {
+  Link,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
+
+import {
+  ChevronDown,
+  FileText,
+  FolderOpen,
+} from "lucide-react";
 
 export function Navbar() {
   const location = useLocation();
@@ -24,23 +34,9 @@ export function Navbar() {
     }
   }
 
-  const links = [
-    {
-      name: "Home",
-      href: "/",
-    },
-    {
-      name: "Create Quiz",
-      href: "/create",
-    },
-    {
-      name: "Join Quiz",
-      href: "/join",
-    },
-  ];
-
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/90 backdrop-blur-xl">
+
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6">
 
         {/* Logo */}
@@ -54,46 +50,175 @@ export function Navbar() {
           </div>
 
           <div>
+
             <h1 className="text-2xl font-bold text-slate-900">
               QuizPulse
             </h1>
 
             <p className="text-xs text-slate-500">
-              Live Quiz Platform
+              AI-powered Quiz Platform
             </p>
+
           </div>
+
         </Link>
 
         {/* Navigation */}
 
-        <nav className="hidden items-center gap-10 md:flex">
+        <nav className="hidden items-center gap-8 md:flex">
 
-          {links.map((link) => {
-            const active =
-              link.href === "/"
-                ? location.pathname === "/"
-                : location.pathname.startsWith(
-                    link.href
-                  );
+          <Link
+            to="/"
+            className={
+              location.pathname === "/"
+                ? "font-medium text-blue-600"
+                : "font-medium text-slate-600 hover:text-blue-600"
+            }
+          >
+            Home
+          </Link>
 
-            return (
-              <Link
-                key={link.name}
-                to={link.href}
-                className={`font-medium transition-colors ${
-                  active
-                    ? "text-blue-600"
-                    : "text-slate-600 hover:text-blue-600"
-                }`}
-              >
-                {link.name}
-              </Link>
-            );
-          })}
+          <button
+            onClick={() => {
+              if (location.pathname === "/") {
+                document
+                  .getElementById("my-quizzes")
+                  ?.scrollIntoView({
+                    behavior: "smooth",
+                  });
+              } else {
+                navigate("/");
+
+                setTimeout(() => {
+                  document
+                    .getElementById(
+                      "my-quizzes"
+                    )
+                    ?.scrollIntoView({
+                      behavior: "smooth",
+                    });
+                }, 150);
+              }
+            }}
+            className="font-medium text-slate-600 hover:text-blue-600"
+          >
+            My Quizzes
+          </button>
+
+          <Link
+            to="/create"
+            className={
+              location.pathname.startsWith(
+                "/create"
+              )
+                ? "font-medium text-blue-600"
+                : "font-medium text-slate-600 hover:text-blue-600"
+            }
+          >
+            Create Quiz
+          </Link>
+
+          {/* AI Dropdown */}
+
+          <div className="group relative">
+
+  <button className="flex items-center gap-1 font-medium text-slate-600 hover:text-blue-600">
+
+    Generate AI Quiz
+
+    <ChevronDown size={16} />
+
+  </button>
+
+  <div
+    className="
+      invisible
+      absolute
+      left-0
+      top-full
+      mt-2
+      w-72
+      rounded-2xl
+      border
+      border-slate-200
+      bg-white
+      p-2
+      opacity-0
+      shadow-xl
+      transition-all
+      duration-200
+      group-hover:visible
+      group-hover:opacity-100
+    "
+  >
+
+    <Link
+      to="/ai"
+      className="flex items-start gap-4 rounded-xl p-3 transition hover:bg-slate-50"
+    >
+      <FileText
+        className="mt-1 text-blue-600"
+        size={20}
+      />
+
+      <div>
+
+        <p className="font-semibold text-slate-900">
+          Topic & Details
+        </p>
+
+        <p className="text-sm text-slate-500">
+          Generate quizzes from any topic
+        </p>
+
+      </div>
+
+    </Link>
+
+    <button
+      disabled
+      className="flex w-full cursor-not-allowed items-start gap-4 rounded-xl p-3 opacity-60"
+    >
+
+      <FolderOpen
+        className="mt-1 text-green-600"
+        size={20}
+      />
+
+      <div className="text-left">
+
+        <p className="font-semibold text-slate-900">
+          Upload PDF
+        </p>
+
+        <p className="text-sm text-slate-500">
+          Coming Soon
+        </p>
+
+      </div>
+
+    </button>
+
+  </div>
+
+</div>
+
+          <Link
+            to="/join"
+            className={
+              location.pathname.startsWith(
+                "/join"
+              )
+                ? "font-medium text-blue-600"
+                : "font-medium text-slate-600 hover:text-blue-600"
+            }
+          >
+            Join Quiz
+          </Link>
 
           <button
             onClick={handleFAQClick}
-            className="font-medium text-slate-600 transition-colors hover:text-blue-600"
+            className="font-medium text-slate-600 hover:text-blue-600"
           >
             FAQ
           </button>
@@ -102,15 +227,12 @@ export function Navbar() {
 
         {/* Right */}
 
-        <div className="flex items-center gap-4">
-
-          <span className="hidden rounded-full bg-blue-50 px-4 py-2 text-sm font-medium text-blue-700 md:block">
-            Create • Host • Play
-          </span>
-
-        </div>
+        <span className="hidden rounded-full bg-blue-50 px-4 py-2 text-sm font-medium text-blue-700 md:block">
+          Create • Host • Play
+        </span>
 
       </div>
+
     </header>
   );
 }

@@ -13,13 +13,12 @@ const Footer = () => {
         <div>
 
           <h2 className="text-3xl font-bold text-white">
-            ⚡ QuizPulse
+            QuizPulse
           </h2>
 
           <p className="mt-5 leading-7 text-slate-400">
-            Create engaging quizzes, host live
-            sessions and challenge your audience
-            with real-time gameplay.
+            AI-powered multiplayer quiz platform for creating,
+            hosting and playing engaging live quizzes in real time.
           </p>
 
         </div>
@@ -35,17 +34,31 @@ const Footer = () => {
           <div className="mt-5 space-y-3">
 
             <Link
-              to="/"
-              className="block transition hover:text-blue-400"
-            >
-              Home
-            </Link>
-
-            <Link
               to="/create"
               className="block transition hover:text-blue-400"
             >
               Create Quiz
+            </Link>
+
+            <Link
+              to="/ai"
+              className="block transition hover:text-blue-400"
+            >
+              Generate AI Quiz
+            </Link>
+
+            <Link
+              to="/"
+              onClick={() =>
+                document
+                  .getElementById("my-quizzes")
+                  ?.scrollIntoView({
+                    behavior: "smooth",
+                  })
+              }
+              className="block transition hover:text-blue-400"
+            >
+              My Quizzes
             </Link>
 
             <Link
@@ -69,15 +82,15 @@ const Footer = () => {
 
           <div className="mt-5 space-y-3">
 
-            <p>⚡ Real-time Gameplay</p>
+  <p>🤖 AI Quiz Generator</p>
 
-            <p>🏆 Live Leaderboards</p>
+  <p>⚡ Real-time Gameplay</p>
 
-            <p>🤖 AI Quiz Generator</p>
+  <p>🏆 Live Leaderboards</p>
 
-            <p>📱 QR Code Join</p>
+  <p>📱 QR Room Join</p>
 
-          </div>
+</div>
 
         </div>
 
@@ -114,6 +127,7 @@ const Footer = () => {
       </div>
 
       <div className="border-t border-slate-800">
+
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-6 py-6 text-sm text-slate-500 md:flex-row">
 
           <p>
@@ -121,11 +135,13 @@ const Footer = () => {
           </p>
 
           <p>
-            Built with ❤️ by Vaishnavi 
+            Built with ❤️ by Vaishnavi Waghmare
           </p>
 
         </div>
+
       </div>
+
     </footer>
   );
 };

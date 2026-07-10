@@ -7,6 +7,7 @@ import PlayQuizPage from "@/features/player/pages/PlayQuizPage";
 import QuestionPage from "@/features/player/pages/QuestionPage";
 import ResultsPage from "@/features/player/pages/ResultsPage";
 import LeaderboardPage from "@/features/player/pages/LeaderboardPage";
+import AiQuizPage from "@/features/ai/pages/AiQuizPage";
 
 export const routes = [
   {
@@ -17,6 +18,10 @@ export const routes = [
     path: "/create",
     element: <CreateQuizPage />,
   },
+  {
+  path: "/ai",
+  element: <AiQuizPage />,
+},
   {
     path: "/login",
     element: <LoginPage />,

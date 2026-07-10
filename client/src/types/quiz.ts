@@ -10,4 +10,5 @@ export interface Quiz {
   description: string;
   difficulty: "easy" | "medium" | "hard";
   questions: Question[];
+  source: "manual" | "ai";
 }

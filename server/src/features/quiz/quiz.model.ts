@@ -72,6 +72,11 @@ const QuizSchema = new Schema(
       type: String,
       default: "anonymous",
     },
+    source: {
+  type: String,
+  enum: ["manual", "ai"],
+  default: "manual",
+},
   },
   {
     timestamps: true,

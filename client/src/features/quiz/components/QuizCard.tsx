@@ -13,6 +13,7 @@ interface Props {
   description: string;
   difficulty: string;
   questionCount: number;
+  source: "manual" | "ai";
 }
 
 export default function QuizCard({
@@ -21,6 +22,7 @@ export default function QuizCard({
   description,
   difficulty,
   questionCount,
+  source,
 }: Props) {
   const navigate = useNavigate();
 
@@ -66,13 +68,16 @@ export default function QuizCard({
             {description}
           </p>
 
-          <div className="mt-5 flex flex-wrap gap-2">
-            <Badge>{difficulty}</Badge>
+          {source === "ai" ? (
+  <span className="rounded-full bg-violet-100 px-3 py-1 text-xs font-semibold text-violet-700">
+    AI Generated
+  </span>
+) : (
+  <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
+    Manual
+  </span>
+)}
 
-            <Badge>
-              {questionCount} Questions
-            </Badge>
-          </div>
         </div>
 
         {/* Footer */}

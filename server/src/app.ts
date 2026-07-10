@@ -4,6 +4,7 @@ import { env } from "./config/env.js";
 import roomRoutes from "./features/room/room.routes.js";
 import quizRoutes from "./features/quiz/quiz.routes.js";
 import gameRoutes from "./features/game/game.routes.js";
+import aiRoutes from "./features/ai/ai.routes.js";
 
 const app = express();
 
@@ -24,9 +25,9 @@ app.get("/health", (_req, res) => {
   });
 });
 
-// 👇 THIS IS THE IMPORTANT LINE
 app.use("/api/rooms", roomRoutes);
 app.use("/api/quizzes", quizRoutes);
+app.use("/api/ai", aiRoutes);
 
 export default app;
 

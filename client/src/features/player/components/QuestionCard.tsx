@@ -103,7 +103,7 @@ export default function QuestionCard({
       {correctAnswer === null &&
         selected !== null && (
           <p className="mt-8 text-center font-semibold text-indigo-600">
-            ✅ Answer submitted. Waiting for timer...
+            ✅ Answer submitted. Waiting for timer to end . 
           </p>
         )}
 

@@ -10,11 +10,13 @@
     "dev": "echo \"Configure client and server first\""
   },
   "dependencies": {
+    "@google/genai": "^2.10.0",
     "@tanstack/react-query": "^5.101.2",
     "axios": "^1.18.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "lucide-react": "^1.23.0",
+    "lucide-react": "^1.24.0",
+    "openai": "^6.45.0",
     "react-hot-toast": "^2.6.0",
     "react-qr-code": "^2.2.0",
     "zustand": "^5.0.14"
