@@ -5,6 +5,7 @@ import roomRoutes from "./features/room/room.routes.js";
 import quizRoutes from "./features/quiz/quiz.routes.js";
 import gameRoutes from "./features/game/game.routes.js";
 import aiRoutes from "./features/ai/ai.routes.js";
+import pdfRoutes from "./features/ai/pdf.routes.js";
 
 const app = express();
 
@@ -28,6 +29,7 @@ app.get("/health", (_req, res) => {
 app.use("/api/rooms", roomRoutes);
 app.use("/api/quizzes", quizRoutes);
 app.use("/api/ai", aiRoutes);
+app.use("/api/pdf", pdfRoutes);
 
 export default app;
 

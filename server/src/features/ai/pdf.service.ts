@@ -1,7 +1,5 @@
 import { GoogleGenAI } from "@google/genai";
 
-import type { GenerateQuizRequest } from "./ai.types.js";
-
 const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY!,
 });
@@ -40,22 +38,26 @@ async function generateWithRetry(prompt: string) {
     }
   }
 
-  throw new Error("Unable to generate quiz.");
+  throw new Error("Unable to generate quiz from PDF.");
 }
 
-export async function generateQuiz(
-  payload: GenerateQuizRequest
+export async function generateQuizFromPdf(
+  text: string,
+  difficulty: string,
+  questions: number
 ) {
   const prompt = `
 You are an expert quiz generator.
 
-Generate a quiz on the topic:
-"${payload.topic}"
+Using ONLY the study material below, generate a multiple-choice quiz.
+
+Study Material:
+${text.substring(0, 25000)}
+
+Generate exactly ${questions} questions.
 
 Difficulty:
-${payload.difficulty}
-
-Generate exactly ${payload.questions} questions.
+${difficulty}
 
 Return ONLY valid JSON.
 
@@ -64,7 +66,7 @@ Use this schema exactly:
 {
   "title": "string",
   "description": "string",
-  "difficulty": "easy | medium | hard",
+  "difficulty": "${difficulty}",
   "questions": [
     {
       "question": "string",
@@ -83,29 +85,29 @@ Use this schema exactly:
 
 Rules:
 
+- Use ONLY information from the PDF.
 - Exactly four options.
 - correctAnswer must be an integer between 0 and 3.
-- Keep questions concise.
-- Keep options concise.
-- Return ONLY valid JSON.
-- Do not wrap JSON inside markdown.
+- Do not include explanations.
+- Do not include markdown.
+- Do not wrap the JSON inside \`\`\`.
+- Return ONLY JSON.
 `;
 
   const response = await generateWithRetry(prompt);
 
-  let text = response.text ?? "";
+  let result = response.text ?? "";
 
-  // Gemini sometimes returns JSON inside markdown fences.
-  text = text
+  result = result
     .replace(/```json/g, "")
     .replace(/```/g, "")
     .trim();
 
-  console.log("✅ Gemini Response:");
-  console.log(text);
+  console.log("✅ Gemini PDF Response:");
+  console.log(result);
 
   try {
-    return JSON.parse(text);
+    return JSON.parse(result);
   } catch {
     throw new Error(
       "Gemini returned an invalid JSON response."
