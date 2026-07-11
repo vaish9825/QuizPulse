@@ -24,10 +24,6 @@ export function useLeaderboard() {
     const onLeaderboardUpdated = (
       payload: LeaderboardData
     ) => {
-      console.log(
-        "🏆 LEADERBOARD RECEIVED",
-        payload
-      );
 
       sessionStorage.setItem(
         "leaderboard",

@@ -23,9 +23,6 @@ async function generateWithRetry(prompt: string) {
       });
     } catch (err: any) {
       if (err.status === 503 && attempt < maxRetries) {
-        console.log(
-          `⚠️ Gemini busy. Retrying (${attempt}/${maxRetries})...`
-        );
 
         await new Promise((resolve) =>
           setTimeout(resolve, attempt * 3000)
@@ -103,7 +100,6 @@ Rules:
     .replace(/```/g, "")
     .trim();
 
-  console.log("✅ Gemini PDF Response:");
   console.log(result);
 
   try {

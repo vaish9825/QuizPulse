@@ -1,8 +1,4 @@
-import axios from "axios";
-
-const API =
-  import.meta.env.VITE_API_URL ??
-  "http://localhost:5000";
+import { api } from "@/lib/api";
 
 export async function generateQuiz(
   payload: {
@@ -14,10 +10,10 @@ export async function generateQuiz(
     questions: number;
   }
 ) {
-  const { data } = await axios.post(
-    `${API}/api/ai/generate/topic`,
-    payload
-  );
+  const { data } = await api.post(
+  "/ai/generate/topic",
+  payload
+);
 
   return data.quiz;
 }

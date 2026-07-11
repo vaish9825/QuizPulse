@@ -38,7 +38,7 @@ const [file, setFile] =
     >("easy");
 
   const [questions, setQuestions] =
-    useState(10);
+    useState(5);
 
   async function handleGenerate() {
     if (!topic.trim()) return;
@@ -111,7 +111,7 @@ const [file, setFile] =
   setFile(null);
 
   setDifficulty("easy");
-  setQuestions(10);
+  setQuestions(5);
 
   setMode("topic");
 }
@@ -214,7 +214,7 @@ const [file, setFile] =
     <input
       type="number"
       min={2}
-      max={30}
+      max={10}
       className="w-full rounded-xl border p-3"
       value={questions}
       onChange={(e) =>

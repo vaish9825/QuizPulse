@@ -1,14 +1,4 @@
-import axios from "axios";
-
-
-
-const API =
-
-  import.meta.env.VITE_API_URL ??
-
-  "http://localhost:5000";
-
-
+import { api } from "@/lib/api";
 
 export async function generatePdfQuiz(
 
@@ -46,11 +36,8 @@ export async function generatePdfQuiz(
 
   );
 
-
-
-  const { data } = await axios.post(
-
-    `${API}/api/pdf/generate`,
+const { data } = await api.post(
+  "/pdf/generate",
 
     formData,
 
