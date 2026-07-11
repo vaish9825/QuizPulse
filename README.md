@@ -4,6 +4,11 @@ QuizPulse is a full-stack real-time quiz platform that enables users to create, 
 
 Built with scalability in mind, QuizPulse combines a modern React frontend with a modular Node.js backend, real-time communication using Socket.IO, MongoDB for persistent storage, and Google's Gemini API for AI-powered quiz generation.
 
+## 🔗 Live Demo
+
+ https://quiz-pulse-tau.vercel.app/
+
+
 ##  Features
 
 - Create custom MCQ quizzes
