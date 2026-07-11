@@ -21,7 +21,13 @@ export function extractPdfText(
         pdfData.Pages.forEach((page: any) => {
           page.Texts.forEach((item: any) => {
             item.R.forEach((run: any) => {
-              text += decodeURIComponent(run.T) + " ";
+
+              try {
+                text += decodeURIComponent(run.T) + " ";
+              } catch {
+                text += run.T + " ";
+              }
+
             });
           });
 
