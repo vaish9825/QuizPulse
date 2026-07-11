@@ -16,8 +16,6 @@ export default function QuizList({
           id={quiz._id}
           title={quiz.title}
           description={quiz.description}
-          difficulty={quiz.difficulty}
-          questionCount={quiz.questions.length}
           source={quiz.source}
         />
       ))}

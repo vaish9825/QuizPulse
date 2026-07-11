@@ -1,21 +1,14 @@
-import { useState } from "react";
 import {
   Link,
   useLocation,
   useNavigate,
 } from "react-router-dom";
 
-import { ChevronDown } from "lucide-react";
-
 export function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const [aiMenuOpen, setAiMenuOpen] =
-    useState(false);
-
   function handleFAQClick() {
-    setAiMenuOpen(false);
 
     if (location.pathname === "/") {
       document
@@ -37,7 +30,6 @@ export function Navbar() {
   }
 
   function handleMyQuizzes() {
-    setAiMenuOpen(false);
 
     if (location.pathname === "/") {
       document
@@ -67,7 +59,6 @@ export function Navbar() {
         <Link
           to="/"
           className="flex items-center gap-3"
-          onClick={() => setAiMenuOpen(false)}
         >
           <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 text-xl font-bold text-white shadow-lg">
             ⚡

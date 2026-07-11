@@ -1,6 +1,4 @@
 import { useNavigate } from "react-router-dom";
-
-import { Badge } from "@/shared/components/ui/Badge";
 import { Button } from "@/shared/components/ui/Button";
 import { Card } from "@/shared/components/ui/Card";
 
@@ -11,8 +9,6 @@ interface Props {
   id: string;
   title: string;
   description: string;
-  difficulty: string;
-  questionCount: number;
   source: "manual" | "ai";
 }
 
@@ -20,8 +16,6 @@ export default function QuizCard({
   id,
   title,
   description,
-  difficulty,
-  questionCount,
   source,
 }: Props) {
   const navigate = useNavigate();
