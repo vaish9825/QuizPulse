@@ -111,7 +111,8 @@ Database: MongoDB Atlas
 
 ## 📸 Screenshots
 
-_Add screenshots or GIFs here._
+<img width="1439" height="747" alt="HomePage" src="https://github.com/user-attachments/assets/58e97ced-c50a-4414-a791-024981589476" />
+
 
 ---
 
