@@ -6,7 +6,7 @@ Built with scalability in mind, QuizPulse combines a modern React frontend with 
 
 ## 🔗 Live Demo
 
- https://quiz-pulse-tau.vercel.app/
+https://quizpulselive.vercel.app/
 
 
 ##  Features
